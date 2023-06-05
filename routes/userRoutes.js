@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const authController = require('../controllers/authController');
+const transactionRouter = require('../routes/transactionRoutes');
 
 const {
   getUser,
@@ -12,10 +13,12 @@ const {
   deleteMe,
   getMe,
   uploadUserPhoto,
-  resizeUserPhoto,
+  resizeUserPhoto
 } = require('../controllers/userController');
 
 const router = express.Router();
+
+router.use('/:userId/transactions', transactionRouter);
 
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);

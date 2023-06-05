@@ -58,7 +58,7 @@ exports.getMe = (req, res, next) => {
 };
 
 exports.getAllUsers = factory.getAll(User);
-exports.getUser = factory.getOne(User);
+exports.getUser = factory.getOne(User, { path: 'transactions' });
 
 //Don't try to update users password using this endpoint even as an admin
 exports.updateUser = factory.updateOne(User);
@@ -83,24 +83,24 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   //3 Update User document
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filterBody, {
     new: true,
-    runValidators: true,
+    runValidators: true
   });
   res.status(200).json({
     status: 'success',
     data: {
-      user: updatedUser,
-    },
+      user: updatedUser
+    }
   });
 });
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
   //3 Update User document
   await User.findByIdAndUpdate(req.user.id, {
-    active: false,
+    active: false
   });
 
   res.status(204).json({
     status: 'success',
-    data: null,
+    data: null
   });
 });

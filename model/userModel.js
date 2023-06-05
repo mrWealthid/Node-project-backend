@@ -2,39 +2,45 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const slugify = require('slugify');
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: [true, 'Please tell us your name!'] },
   email: {
     type: String,
-    required: [true, 'Please provide your emails'],
+    required: [true, 'Please provide your email'],
     unique: true,
     lowercase: true,
-    validate: [validator.isEmail, 'Please provide a valid emails'],
+    validate: [validator.isEmail, 'Please provide a valid email']
   },
   photo: { type: String, default: 'default.jpg' },
   role: {
     type: String,
-    enum: ['user', 'guide', 'lead-guide', 'admin'],
-    default: 'user',
+    enum: ['user', 'admin'],
+    default: 'user'
   },
 
   password: {
     type: String,
     required: [true, 'Please provide a password'],
     minlength: 8,
-    select: false,
+    select: false
+  },
+
+  accountNumber: {
+    type: Number,
+    minlength: 7
   },
   passwordConfirm: {
     type: String,
     required: [true, 'Please confirm your password'],
     validate: {
       //THIS ONLY WORKS ON CREATE AND SAVE!!!
-      validator: function (el) {
+      validator: function(el) {
         return el === this.password;
       },
-      message: 'Passwords do not match',
-    },
+      message: 'Passwords do not match'
+    }
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
@@ -42,11 +48,22 @@ const userSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     default: true,
-    select: false,
-  },
-});
+    select: false
+  }
+}, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-userSchema.pre('save', async function (next) {
+function generateUniqueAccountNumber() {
+  const timestamp = Date.now();
+  const randomDigits = +crypto.randomBytes(2).readUInt16BE(0).toString();
+  const result = timestamp + randomDigits;
+  return Number(result.toString().slice(-7));
+}
+
+userSchema.pre('save', function(next) {
+  this.accountNumber = generateUniqueAccountNumber();
+  next();
+});
+userSchema.pre('save', async function(next) {
   //Only run function if password was modified
   if (!this.isModified('password')) return next();
 
@@ -61,7 +78,13 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-userSchema.methods.changedPasswordAfter = async function (JWTTimestamp) {
+//Virtual Populate
+userSchema.virtual('transactions', {
+  ref: 'Transaction',
+  foreignField: 'user',
+  localField: '_id'
+});
+userSchema.methods.changedPasswordAfter = async function(JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimeStamp = parseInt(
       this.passwordChangedAt.getTime() / 1000,
@@ -73,7 +96,7 @@ userSchema.methods.changedPasswordAfter = async function (JWTTimestamp) {
   return false;
 };
 
-userSchema.pre('save', function (next) {
+userSchema.pre('save', function(next) {
   if (!this.isModified('password') || this.isNew) return next();
   this.passwordChangedAt = Date.now() - 1000;
 
@@ -81,14 +104,14 @@ userSchema.pre('save', function (next) {
   next();
 });
 
-userSchema.methods.correctPassword = async function (
+userSchema.methods.correctPassword = async function(
   candidatePassword,
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-userSchema.methods.createPasswordResetToken = function () {
+userSchema.methods.createPasswordResetToken = function() {
   const resetToken = crypto.randomBytes(32).toString('hex');
   this.passwordResetToken = crypto
     .createHash('sha256')
@@ -102,7 +125,7 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
-userSchema.pre(/^find/, function (next) {
+userSchema.pre(/^find/, function(next) {
   // this.find({ active: false });
   this.find({ active: { $ne: false } });
   next();
