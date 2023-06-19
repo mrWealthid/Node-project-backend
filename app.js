@@ -7,11 +7,13 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const compression = require('compression');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
 const userRouter = require('./routes/userRoutes');
+const transactionRouter = require('./routes/transactionRoutes');
 
 const filepath = path.join(process.cwd(), 'public');
 
@@ -46,7 +48,7 @@ if (process.env.NODE_ENV === 'development') {
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
-  message: 'Too many Request from this IP, please try again in an hour'
+  message: 'Too many Request from this IP, please try again in an hour',
 });
 
 app.use('/api', limiter);
@@ -54,6 +56,8 @@ app.use('/api', limiter);
 //Body Parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
 
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
 //Data Sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
@@ -68,8 +72,8 @@ app.use(
       'ratingsQuantity',
       'maxGroupSize',
       'difficulty',
-      'price'
-    ]
+      'price',
+    ],
   })
 );
 //Serving Static Files
@@ -87,11 +91,9 @@ app.use((req, res, next) => {
 
   next();
 });
-//
-// app.use('/api/v1/tours', tourRouter);
+
 app.use('/api/v1/users', userRouter);
-// app.use('/api/v1/reviews', reviewRouter);
-// app.use('/api/v1/bookings', bookingRouter);
+app.use('/api/v1/transactions', transactionRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`can't find ${req.originalUrl} on this server!`, 404));

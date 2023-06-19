@@ -8,7 +8,7 @@ const Email = require('../utils/email');
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN
+    expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
 const createSendToken = (user, statusCode, req, res) => {
@@ -20,7 +20,7 @@ const createSendToken = (user, statusCode, req, res) => {
     ),
 
     httpOnly: true,
-    secure: req.secure || req.header('x-forwarded-proto') === 'https'
+    secure: req.secure || req.header('x-forwarded-proto') === 'https',
   };
 
   // if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
@@ -33,8 +33,8 @@ const createSendToken = (user, statusCode, req, res) => {
     status: 'success',
     token,
     data: {
-      user
-    }
+      user,
+    },
   });
 };
 
@@ -44,7 +44,7 @@ exports.signup = catchAsync(async (req, res) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-    role: req.body.role
+    role: req.body.role,
   });
   const url = `${req.protocol}://${req.get('host')}/me`;
 
@@ -60,7 +60,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
   //2) Check if user exists & password is correct after it's hashed
   const user = await User.findOne({
-    email
+    email,
   }).select('+password');
 
   if (!user || !(await user.correctPassword(password, user.password))) {
@@ -72,7 +72,7 @@ exports.login = catchAsync(async (req, res, next) => {
   const token = signToken(user._id);
   res.status(200).json({
     status: 'success',
-    token
+    token,
   });
 });
 
@@ -114,22 +114,23 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   //Grant access to protected route
   req.user = freshUser;
+
   next();
 });
 
 exports.restrictTo =
   (...roles) =>
-    (req, res, next) => {
-      if (!roles.includes(req.user.role)) {
-        return next(
-          new AppError(
-            'You do not have the permission to perform this action',
-            403
-          )
-        );
-      }
-      next();
-    };
+  (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError(
+          'You do not have the permission to perform this action',
+          403
+        )
+      );
+    }
+    next();
+  };
 
 exports.forgotPassword = async (req, res, next) => {
   //1) Get user based on Posted emails
@@ -155,7 +156,7 @@ exports.forgotPassword = async (req, res, next) => {
     await new Email(user, resetURL).sendPasswordReset();
     res.status(200).json({
       status: 'success',
-      message: 'Token sent to email'
+      message: 'Token sent to email',
     });
   } catch (err) {
     user.passwordResetToken = undefined;
@@ -180,7 +181,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   const user = await User.findOne({
     passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() }
+    passwordResetExpires: { $gt: Date.now() },
   });
 
   //2) If token has not expired and there is a user, set the new password
@@ -199,7 +200,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   const token = signToken(user._id);
   res.status(200).json({
     status: 'success',
-    token
+    token,
   });
 });
 

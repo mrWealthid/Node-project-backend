@@ -46,9 +46,7 @@ exports.getOne = (Model, popOptions) =>
     if (!doc) return new AppError(`No Document found with that ID`, 404);
     res.status(200).json({
       status: 'success',
-      data: {
-        data: doc,
-      },
+      data: doc,
     });
   });
 
@@ -56,7 +54,11 @@ exports.getAll = (Model) =>
   catchAsync(async (req, res, next) => {
     //To allow for nested get review on tour -Hack
     let filter = {};
-    if (req.params.tourId) filter = { tour: req.params.tourId };
+
+    // console.log(req.user);
+    // if (req.params.tourId) filter = { tour: req.params.tourId };
+    if (req.user.id) filter = { user: req.user.id };
+    if (req.user.role === 'admin') filter = {};
     const features = new APIFeatures(Model.find(filter), req.query)
       .filter()
       .sort()
@@ -71,8 +73,6 @@ exports.getAll = (Model) =>
     res.status(200).json({
       status: 'success',
       results: doc.length,
-      data: {
-        data: doc,
-      },
+      data: doc,
     });
   });

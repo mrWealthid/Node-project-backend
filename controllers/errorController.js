@@ -28,7 +28,7 @@ function sendErrorDev(res, err) {
     error: err,
     status: err.status,
     message: err.message,
-    stack: err.stack,
+    stack: err.stack
   });
 }
 function sendErrorProd(res, err) {
@@ -36,7 +36,7 @@ function sendErrorProd(res, err) {
   if (err.isOperational) {
     res.status(err.statusCode).json({
       status: err.status,
-      message: err.message,
+      message: err.message
     });
   }
   //Programming or other unknown error: don't leak error details
@@ -46,7 +46,7 @@ function sendErrorProd(res, err) {
     //2 Send generic message
     res.status(500).json({
       status: 'error',
-      message: 'Something went very wrong',
+      message: 'Something went very wrong'
     });
   }
 }
@@ -56,6 +56,8 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
+    if (err.name === 'JsonWebTokenError') err = handleJWTError();
+    if (err.name === 'TokenExpiredError') err = handleExpiredToken();
     sendErrorDev(res, err);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };

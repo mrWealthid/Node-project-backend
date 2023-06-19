@@ -8,7 +8,7 @@ const router = express.Router({ mergeParams: true });
 router.use(authController.protect);
 router
   .route('/')
-  .get(transactionController.getAllTransactions)
+  .get(authController.protect, transactionController.getAllTransactions)
   .post(
     authController.restrictTo('user'),
     transactionController.setTransUserIds,
