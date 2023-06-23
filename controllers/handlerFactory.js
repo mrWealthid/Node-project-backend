@@ -65,6 +65,8 @@ exports.getAll = (Model) =>
       .limitFields()
       .paginate();
 
+    const allDoc = await Model.find();
+
     //Execute Query
     // const doc = await features.query.explain();
     const doc = await features.query;
@@ -72,6 +74,7 @@ exports.getAll = (Model) =>
     //Send Response
     res.status(200).json({
       status: 'success',
+      totalRecords: allDoc.length,
       results: doc.length,
       data: doc,
     });
