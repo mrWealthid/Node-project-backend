@@ -104,3 +104,16 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+exports.accountLookup = catchAsync(async (req, res, next) => {
+  const { query } = req;
+  const doc = await User.find(query);
+
+  if (doc.length < 1) {
+    return next(new AppError('Failed, User not found!', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    data: doc,
+  });
+});
