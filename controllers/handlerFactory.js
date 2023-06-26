@@ -20,6 +20,7 @@ exports.updateOne = (Model) =>
       runValidators: true,
     });
     if (!doc) return next(new AppError(`No document found with that ID`, 404));
+
     res.status(201).json({
       status: 'success',
       data: {
@@ -43,7 +44,9 @@ exports.getOne = (Model, popOptions) =>
     if (popOptions) query = query.populate(popOptions);
 
     const doc = await query;
+
     if (!doc) return new AppError(`No Document found with that ID`, 404);
+
     res.status(200).json({
       status: 'success',
       data: doc,

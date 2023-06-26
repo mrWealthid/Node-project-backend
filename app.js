@@ -20,14 +20,18 @@ const filepath = path.join(process.cwd(), 'public');
 const app = express();
 
 //To trust proxies
-app.enable('trust proxy');
+// app.enable('trust proxy');
 
 console.log(process.env.NODE_ENV);
 
 ////1) GLOBAL MIDDLEWARES4
 
 //SET Security HTTP Headers
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
 
 app.use(cors());
 //Access-Control-Allow-Origin *
@@ -51,6 +55,7 @@ const limiter = rateLimit({
   message: 'Too many Request from this IP, please try again in an hour',
 });
 
+// app.use(express.static('public'));
 app.use('/api', limiter);
 
 //Body Parser, reading data from body into req.body

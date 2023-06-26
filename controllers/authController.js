@@ -38,6 +38,21 @@ const createSendToken = (user, statusCode, req, res) => {
   });
 };
 
+function generateUniqueAccountNumber() {
+  let randomDigits;
+  let result;
+  const timestamp = Date.now().toString().slice(9);
+  if (crypto && crypto.getRandomValues) {
+    const array = new Uint8Array(7);
+    crypto.getRandomValues(array);
+    randomDigits = array.join('').slice(0, 7);
+
+    result = Number(timestamp) + Number(randomDigits);
+  }
+
+  return result;
+}
+
 exports.signup = catchAsync(async (req, res) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -45,6 +60,7 @@ exports.signup = catchAsync(async (req, res) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     role: req.body.role,
+    accountNumber: generateUniqueAccountNumber(),
   });
   const url = `${req.protocol}://${req.get('host')}/me`;
 
