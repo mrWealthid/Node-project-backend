@@ -1,12 +1,8 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
-const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
-const slugify = require('slugify');
 
 const transactionSchema = new mongoose.Schema(
   {
-    depositorName: {
+    initiatorName: {
       type: String,
       required: [true, 'Please tell us your name!'],
     },
@@ -43,7 +39,11 @@ const transactionSchema = new mongoose.Schema(
     //   select: false
     // },
 
-    depositorAccountNumber: {
+    initiatorAccountNumber: {
+      type: Number,
+      minlength: 7,
+    },
+    beneficiaryAccountNumber: {
       type: Number,
       minlength: 7,
     },
