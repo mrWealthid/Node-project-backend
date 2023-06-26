@@ -11,7 +11,6 @@ router
   .get(authController.protect, transactionController.getAllTransactions)
   .post(
     authController.restrictTo('user'),
-    transactionController.setTransUserIds,
     transactionController.createTransaction
   );
 
