@@ -33,7 +33,7 @@ app.use(
   })
 );
 
-app.use(cors());
+// app.use(cors());
 //Access-Control-Allow-Origin *
 //api.natours.com, front-end natours.com
 //app.use(cors({
@@ -41,7 +41,7 @@ app.use(cors());
 //})
 
 //For complex requests with preflight; such as delete or put
-app.options('*', cors());
+// app.options('*', cors());
 // app.options('/api/v1/tours/:id', cors());
 
 //Development Logging

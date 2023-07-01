@@ -68,7 +68,12 @@ const userSchema = new mongoose.Schema(
 // });
 
 userSchema.virtual('imgUrl').get(function () {
-  return `/img/users/${this.photo}`;
+  const env = process.env.NODE_ENV;
+
+  const url = /development/i.test(env)
+    ? `${process.env.DEVELOPMENT_URL}:${process.env.PORT}`
+    : process.env.PROD_URL;
+  return `${url}/img/users/${this.photo}`;
 });
 userSchema.pre('save', async function (next) {
   //Only run function if password was modified
