@@ -1,4 +1,5 @@
 // const catchAsync = require('../utils/catchAsync');
+const { Types } = require('mongoose');
 const Transaction = require('../model/transactionModel');
 const factory = require('./handlerFactory');
 const catchAsync = require('../utils/catchAsync');
@@ -56,20 +57,7 @@ exports.getTransactionMonthlyStats = catchAsync(async (req, res) => {
 
   const isAdmin = req.user.role === 'admin';
 
-  // if (req.user.role === 'user') {
-  //   match.user = '6498e85c375e71310111c845';
-  // }
-
   const stats = await Transaction.aggregate([
-    // { $unwind: '$startDates' }, //The method seperates data from an array
-    // {
-    //   $lookup: {
-    //     from: 'User', // Replace 'users' with the actual name of the user collection
-    //     localField: '_id',
-    //     foreignField: 'user',
-    //     as: 'user',
-    //   },
-    // },
     {
       $match: {
         createdAt: {
@@ -77,17 +65,133 @@ exports.getTransactionMonthlyStats = catchAsync(async (req, res) => {
           $lte: new Date(`${year}-12-31`),
         },
 
-        // beneficiaryAccountNumber: {
-        //   $eq: 8720650,
-        // },
-        // $or: [
-        //   { initiatorAccountNumber: { $eq: 8720650 } },
-        //   { beneficiaryAccountNumber: { $eq: 8720650 } },
-        // ],
+        $or: [
+          {
+            $and: [{ user: { $eq: new Types.ObjectId(req.user.id) } }],
+          },
+          {
+            $expr: {
+              $eq: [isAdmin, true],
+            },
+          },
+        ],
+        transactionType: {
+          $eq: `${type}`,
+        },
+      },
+    },
 
-        // initiatorAccountNumber: {
-        //   $eq: 8720650,
-        // },
+    {
+      $group: {
+        _id: {
+          $switch: {
+            branches: [
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 1] },
+                then: { month: 'January', monthNum: 1 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 2] },
+                then: { month: 'February', monthNum: 2 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 3] },
+                then: { month: 'March', monthNum: 3 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 4] },
+                then: { month: 'April', monthNum: 4 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 5] },
+                then: { month: 'May', monthNum: 5 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 6] },
+                then: { month: 'June', monthNum: 6 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 7] },
+                then: { month: 'July', monthNum: 7 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 8] },
+                then: { month: 'August', monthNum: 8 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 9] },
+                then: { month: 'September', monthNum: 9 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 10] },
+                then: { month: 'October', monthNum: 10 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 11] },
+                then: { month: 'November', monthNum: 11 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 12] },
+                then: { month: 'December', monthNum: 12 },
+              },
+            ],
+            default: 'Invalid',
+          },
+        },
+        total: { $sum: 1 },
+        // transactions: { $addToSet: '$amount' },
+        transactions: { $push: '$amount' },
+        totalAmount: { $sum: '$amount' },
+      },
+    },
+    { $addFields: { time: '$_id' } },
+
+    {
+      $project: { _id: 0 },
+    },
+    {
+      $sort: {
+        'time.monthNum': 1,
+      },
+    },
+    { $limit: 12 },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      stats,
+    },
+  });
+});
+
+exports.getTransactionStats = catchAsync(async (req, res) => {
+  const { time } = req.params.time;
+  const { type } = req.params.type;
+
+  let startDate;
+  let endDate;
+  // if (type === 'month') {
+  // startDate = new Date().setMonth(Number(time), 1);
+  // endDate = new Date().setMonth(time, 30);
+  //
+  // console.log(startDate);
+  // console.log(endDate);
+  // if (type === 'year') {
+  //   startDate = new Date().setFullYear(time, 1);
+  //   endDate = new Date().setFullYear(time, 12);
+  // }
+
+  const isAdmin = req.user.role === 'admin';
+
+  const stats = await Transaction.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate),
+        },
+
         $or: [
           {
             $and: [
