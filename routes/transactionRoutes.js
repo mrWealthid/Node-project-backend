@@ -32,4 +32,8 @@ router
   .route('/monthly-stats/:type/:year')
   .get(transactionController.getTransactionMonthlyStats);
 
+router
+  .route('/stats/:type/:time')
+  .get(transactionController.getTransactionStats);
+
 module.exports = router;

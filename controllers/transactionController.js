@@ -166,21 +166,21 @@ exports.getTransactionMonthlyStats = catchAsync(async (req, res) => {
 });
 
 exports.getTransactionStats = catchAsync(async (req, res) => {
-  const { time } = req.params.time;
-  const { type } = req.params.type;
+  const { time } = req.params;
+  const { type } = req.params;
 
   let startDate;
   let endDate;
-  // if (type === 'month') {
-  // startDate = new Date().setMonth(Number(time), 1);
-  // endDate = new Date().setMonth(time, 30);
-  //
-  // console.log(startDate);
-  // console.log(endDate);
-  // if (type === 'year') {
-  //   startDate = new Date().setFullYear(time, 1);
-  //   endDate = new Date().setFullYear(time, 12);
-  // }
+
+  if (type === 'month') {
+    startDate = new Date().setMonth(time, 1);
+    endDate = new Date().setMonth(time, 30);
+  }
+
+  if (type === 'year') {
+    startDate = new Date().setFullYear(time, 1);
+    endDate = new Date().setFullYear(time, 12);
+  }
 
   const isAdmin = req.user.role === 'admin';
 
@@ -191,19 +191,9 @@ exports.getTransactionStats = catchAsync(async (req, res) => {
           $gte: new Date(startDate),
           $lte: new Date(endDate),
         },
-
         $or: [
           {
-            $and: [
-              { initiatorAccountNumber: { $eq: req.user.accountNumber } },
-              { beneficiaryAccountNumber: { $ne: req.user.accountNumber } },
-            ],
-          },
-          {
-            $and: [
-              { beneficiaryAccountNumber: { $eq: req.user.accountNumber } },
-              { initiatorAccountNumber: { $ne: req.user.accountNumber } },
-            ],
+            $and: [{ user: { $eq: new Types.ObjectId(req.user.id) } }],
           },
           {
             $expr: {
@@ -211,85 +201,23 @@ exports.getTransactionStats = catchAsync(async (req, res) => {
             },
           },
         ],
-        transactionType: {
-          $eq: `${type}`,
-        },
       },
     },
 
     {
       $group: {
-        _id: {
-          $switch: {
-            branches: [
-              {
-                case: { $eq: [{ $month: '$createdAt' }, 1] },
-                then: { month: 'January', monthNum: 1 },
-              },
-              {
-                case: { $eq: [{ $month: '$createdAt' }, 2] },
-                then: { month: 'February', monthNum: 2 },
-              },
-              {
-                case: { $eq: [{ $month: '$createdAt' }, 3] },
-                then: { month: 'March', monthNum: 3 },
-              },
-              {
-                case: { $eq: [{ $month: '$createdAt' }, 4] },
-                then: { month: 'April', monthNum: 4 },
-              },
-              {
-                case: { $eq: [{ $month: '$createdAt' }, 5] },
-                then: { month: 'May', monthNum: 5 },
-              },
-              {
-                case: { $eq: [{ $month: '$createdAt' }, 6] },
-                then: { month: 'June', monthNum: 6 },
-              },
-              {
-                case: { $eq: [{ $month: '$createdAt' }, 7] },
-                then: { month: 'July', monthNum: 7 },
-              },
-              {
-                case: { $eq: [{ $month: '$createdAt' }, 8] },
-                then: { month: 'August', monthNum: 8 },
-              },
-              {
-                case: { $eq: [{ $month: '$createdAt' }, 9] },
-                then: { month: 'September', monthNum: 9 },
-              },
-              {
-                case: { $eq: [{ $month: '$createdAt' }, 10] },
-                then: { month: 'October', monthNum: 10 },
-              },
-              {
-                case: { $eq: [{ $month: '$createdAt' }, 11] },
-                then: { month: 'November', monthNum: 11 },
-              },
-              {
-                case: { $eq: [{ $month: '$createdAt' }, 12] },
-                then: { month: 'December', monthNum: 12 },
-              },
-            ],
-            default: 'Invalid',
-          },
-        },
-        total: { $sum: 1 },
+        _id: '$transactionType',
         // transactions: { $addToSet: '$amount' },
         transactions: { $push: '$amount' },
         totalAmount: { $sum: '$amount' },
       },
     },
-    { $addFields: { time: '$_id' } },
+    { $addFields: { type: '$_id' } },
 
     {
       $project: { _id: 0 },
     },
-    {
-      $sort: {
-        'time.monthNum': 1,
-      },
-    },
+
     { $limit: 12 },
   ]);
 

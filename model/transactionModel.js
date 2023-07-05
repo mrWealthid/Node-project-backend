@@ -18,27 +18,6 @@ const transactionSchema = new mongoose.Schema(
       required: [true, 'Transaction must belong to a User.'],
     },
 
-    // email: {
-    //   type: String,
-    //   required: [true, 'Please provide your emails'],
-    //   unique: true,
-    //   lowercase: true,
-    //   validate: [validator.isEmail, 'Please provide a valid emails']
-    // },
-    // photo: { type: String, default: 'default.jpg' },
-    // role: {
-    //   type: String,
-    //   enum: ['user', 'guide', 'lead-guide', 'admin'],
-    //   default: 'user'
-    // },
-
-    // password: {
-    //   type: String,
-    //   required: [true, 'Please provide a password'],
-    //   minlength: 8,
-    //   select: false
-    // },
-
     initiatorAccountNumber: {
       type: Number,
       minlength: 7,
@@ -57,4 +36,6 @@ const transactionSchema = new mongoose.Schema(
 );
 
 const Transaction = mongoose.model('Transaction', transactionSchema);
+
+// Transaction.init().then((x) => console.log(x));
 module.exports = Transaction;
