@@ -68,7 +68,7 @@ exports.getAll = (Model) =>
       .limitFields()
       .paginate();
 
-    const allDoc = await Model.find();
+    const allDoc = await Model.find(filter);
 
     //Execute Query
     // const doc = await features.query.explain();
