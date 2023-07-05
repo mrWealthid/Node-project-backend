@@ -144,4 +144,7 @@ userSchema.pre(/^find/, function (next) {
 });
 
 const User = mongoose.model('User', userSchema);
+
+//Use this if you drop the DB for indexing
+// User.init().then((x) => console.log(x));
 module.exports = User;
