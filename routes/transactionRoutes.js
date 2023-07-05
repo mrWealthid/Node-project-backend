@@ -26,4 +26,10 @@ router
     transactionController.updateTransaction
   );
 
+//Stats
+
+router
+  .route('/monthly-stats/:type/:year')
+  .get(transactionController.getTransactionMonthlyStats);
+
 module.exports = router;
