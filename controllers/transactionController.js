@@ -204,19 +204,46 @@ exports.getTransactionStats = catchAsync(async (req, res) => {
       },
     },
 
+    // {
+    //   $group: {
+    //     _id: '$transactionType',
+    //     // transactions: { $addToSet: '$amount' },
+    //     transactions: { $push: '$amount' },
+    //     totalAmount: { $sum: '$amount' },
+    //   },
+    // },
+
     {
       $group: {
         _id: '$transactionType',
-        // transactions: { $addToSet: '$amount' },
         transactions: { $push: '$amount' },
         totalAmount: { $sum: '$amount' },
       },
     },
-    { $addFields: { type: '$_id' } },
-
     {
-      $project: { _id: 0 },
+      $group: {
+        _id: null,
+        result: {
+          $push: {
+            k: '$_id',
+            v: {
+              transactions: '$transactions',
+              totalAmount: '$totalAmount',
+            },
+          },
+        },
+      },
     },
+    {
+      $replaceRoot: {
+        newRoot: { $arrayToObject: '$result' },
+      },
+    },
+    // { $addFields: { type: '$_id' } },
+
+    // {
+    //   $project: { _id: 0 },
+    // },
 
     { $limit: 12 },
   ]);
