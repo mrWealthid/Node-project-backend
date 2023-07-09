@@ -61,6 +61,7 @@ exports.signup = catchAsync(async (req, res) => {
     passwordConfirm: req.body.passwordConfirm,
     role: req.body.role,
     accountNumber: generateUniqueAccountNumber(),
+    dateOfBirth: req.body.dateOfBirth,
   });
   const url = `${req.protocol}://${req.get('host')}/me`;
 

@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const slugify = require('slugify');
 
 const userSchema = new mongoose.Schema(
   {
@@ -31,6 +30,11 @@ const userSchema = new mongoose.Schema(
     accountNumber: {
       type: Number,
       minlength: 7,
+    },
+
+    dateOfBirth: {
+      type: Date,
+      required: [true, 'Please add date of birth'],
     },
     passwordConfirm: {
       type: String,
