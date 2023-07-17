@@ -28,6 +28,8 @@ router
 
 //Stats
 
+router.route('/user/balance').get(transactionController.getUserBalance);
+
 router
   .route('/monthly-stats/:type/:year')
   .get(transactionController.getTransactionMonthlyStats);

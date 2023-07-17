@@ -255,3 +255,35 @@ exports.getTransactionStats = catchAsync(async (req, res) => {
     },
   });
 });
+
+exports.getUserBalance = catchAsync(async (req, res) => {
+  // const isAdmin = req.user.role === 'admin';
+  const stats = await Transaction.aggregate([
+    {
+      $match: {
+        user: { $eq: new Types.ObjectId(req.user.id) },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        transactions: { $push: '$amount' },
+        total: { $sum: '$amount' },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+      },
+    },
+
+    { $limit: 12 },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      stats,
+    },
+  });
+});

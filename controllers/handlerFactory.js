@@ -68,16 +68,16 @@ exports.getAll = (Model) =>
       .limitFields()
       .paginate();
 
-    const allDoc = await Model.find(filter);
-
     //Execute Query
     // const doc = await features.query.explain();
     const doc = await features.query;
 
+    const count = await Model.count(filter);
+
     //Send Response
     res.status(200).json({
       status: 'success',
-      totalRecords: allDoc.length,
+      totalRecords: count,
       results: doc.length,
       data: doc,
     });

@@ -14,6 +14,7 @@ const globalErrorHandler = require('./controllers/errorController');
 
 const userRouter = require('./routes/userRoutes');
 const transactionRouter = require('./routes/transactionRoutes');
+const beneficiaryRouter = require('./routes/beneficiaryRoutes');
 
 const filepath = path.join(process.cwd(), 'public');
 
@@ -61,8 +62,8 @@ app.use('/api', limiter);
 //Body Parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
 
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 //Data Sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
@@ -99,6 +100,7 @@ app.use((req, res, next) => {
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/transactions', transactionRouter);
+app.use('/api/v1/beneficiaries', beneficiaryRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`can't find ${req.originalUrl} on this server!`, 404));
