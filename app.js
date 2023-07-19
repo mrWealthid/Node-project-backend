@@ -15,6 +15,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
 const transactionRouter = require('./routes/transactionRoutes');
 const beneficiaryRouter = require('./routes/beneficiaryRoutes');
+const loanRouter = require('./routes/loanRoutes');
 
 const filepath = path.join(process.cwd(), 'public');
 
@@ -101,6 +102,7 @@ app.use((req, res, next) => {
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/transactions', transactionRouter);
 app.use('/api/v1/beneficiaries', beneficiaryRouter);
+app.use('/api/v1/loans', loanRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`can't find ${req.originalUrl} on this server!`, 404));
