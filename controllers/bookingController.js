@@ -26,6 +26,7 @@ console.log(beneficiaryId)
     cancel_url: `https://wealthtech.netlify.app/dashboard/payments`,
     customer_email: req.user.email,
     client_reference_id: req.user.id,
+   metadata: {beneficiary: beneficiary.name, beneficiaryId: beneficiary.id, initiatorName:req.user.name, initiatorId:req.user.id, initiatorAccountNumber:req.user.accountNumber, transactionType:'Credit'},
     mode: 'payment',
     line_items: [
       {
@@ -88,29 +89,30 @@ createBookingCheckout(paymentIntentSucceeded)
 
 async function createBookingCheckout (session)  {
 
-    console.log(session)
-    // const initiator = req.body.initiatorAccountNumber;
-    // const beneficiary = req.body.beneficiaryAccountNumber;
+    console.log(session.metadata)
+
+    const data= session.metadata
+    const initiator = data.initiatorAccountNumber;
+    const beneficiary = data.beneficiaryAccountNumber;
   
-    // if (initiator === beneficiary)
-    //   return next(new AppError("You can't Transfer to self", 404));
-    // const settlement = {
-    //   ...req.body,
+    if (initiator === beneficiary)
+      return next(new AppError("You can't Transfer to self", 404));
+    const settlement = {
+      ...data,
   
-    //   amount: req.body.amount * -1,
-    //   transactionType: 'Debit',
-    //   user: req.user.id,
-    // };
+      amount: session.amount * -1,
+      transactionType: 'Debit',
+      user: data.initiatorId,
+    };
   
-    // const doc = await Transaction.create(req.body);
-    // await Transaction.create(settlement);
+    const doc = await Transaction.create(data);
+    await Transaction.create(settlement);
   
    
-  
-    // res.status(201).json({
-    //   status: 'success',
-    //   data: { data: doc },
-    // });
+    res.status(201).json({
+      status: 'success',
+      data: { data: doc },
+    });
 }
 // exports.createBookingCheckout = catchAsync(async (req, res, next) => {
 //   //THIS IS ONLY TEMPORARY BECAUSE EVERYONE CAN MAKE BOOKINGS WITHOUT PAYING
