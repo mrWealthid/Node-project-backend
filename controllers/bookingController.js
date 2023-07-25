@@ -27,7 +27,6 @@ console.log(beneficiaryId)
     customer_email: req.user.email,
     client_reference_id: req.user.id,
     mode: 'payment',
-    metadata: {beneficiary: beneficiary.name, beneficiaryId: beneficiary.id, initiatorName:req.user.name, initiatorAccountNumber:req.user.accountNumber, transactionType:'Credit'},
     line_items: [
       {
         price_data: {
@@ -53,14 +52,16 @@ console.log(beneficiaryId)
 
 exports.webhoookCheckout = catchAsync(async(req,res, next)=> {
 
-      const sig = request.headers['stripe-signature'];
+      const sig = req.headers['stripe-signature'];
 
   let event;
 
+
+  console.log(sig)
   try {
-    event = stripe.webhooks.constructEvent(request.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
-    response.status(400).send(`Webhook Error: ${err.message}`);
+    res.status(400).send(`Webhook Error: ${err.message}`);
     return;
   }
 
