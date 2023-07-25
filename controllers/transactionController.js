@@ -31,16 +31,7 @@ exports.createTransaction = catchAsync(async (req, res, next) => {
   const doc = await Transaction.create(req.body);
   await Transaction.create(settlement);
 
-  // const checkTransactionStatus = doc.every((val) => val.status === 'fulfilled');
-  //
-  // if()
-  // "initiatorName": "Wealth Bank",
-  //   "amount": 200000,
-  //   "transactionType": "credit",
-  //   "user":"647a9a9451eb622b52ff67f3",
-  //   "initiatorAccountNumber":1234567,
-  //   "beneficiaryAccountNumber":8720650
-  //
+ 
 
   res.status(201).json({
     status: 'success',
