@@ -21,9 +21,9 @@ console.log(beneficiaryId)
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `${req.protocol}://${req.get('host')}/dashboard/payments`,
+    success_url: `https://wealthtech.netlify.app/dashboard/payments`,
  
-    cancel_url: `${req.protocol}://${req.get('host')}/dashboard/payments`,
+    cancel_url: `https://wealthtech.netlify.app/dashboard/payments`,
     customer_email: req.user.email,
     client_reference_id: req.user.id,
     mode: 'payment',
