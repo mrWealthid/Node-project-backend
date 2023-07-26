@@ -27,7 +27,7 @@ console.log(beneficiaryId)
     customer_email: req.user.email,
     client_reference_id: beneficiary.id,
 
-    metadata:{'beneficiary': beneficiary.id},
+    // metadata:{'beneficiary': beneficiary.id},
 //    metadata: {beneficiary: beneficiary.name, beneficiaryId: beneficiary.id, initiatorName:req.user.name, initiatorId:req.user.id, initiatorAccountNumber:req.user.accountNumber, transactionType:'Credit'},
     mode: 'payment',
     line_items: [
