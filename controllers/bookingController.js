@@ -1,5 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const User = require('../model/userModel');
+const Transaction= require('../model/transactionModel')
 const Booking = require('../model/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -59,10 +60,6 @@ exports.webhoookCheckout = catchAsync(async(req,res, next)=> {
 
   let event;
 
-
-  console.log({sig})
-
-  console.log({req})
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
@@ -121,7 +118,7 @@ const beneficiary=  await User.findById(beneficiaryId);
 const userDetails=  await User.find({email: email});
 
 
-console.log({userDetails})
+console.log({userDetails: userDetails[0]})
 
 
 // const initiator = userDetails.initiatorAccountNumber;
