@@ -116,8 +116,10 @@ async function  handleSessionCompleted(session) {
   const beneficiaryId = session.client_reference_id
   const email = session.email
 
+  console.log('Email', email)
+
 const beneficiaryDetails=  await User.findById(beneficiaryId);
-const userDetails=  await User.find(email);
+const userDetails=  await User.find({email: email});
 
 
 console.log({beneficiaryDetails})
