@@ -43,16 +43,7 @@ console.log(beneficiaryId)
       },
     ],
 
-    custom_fields: [
-        {
-          key: 'beneficiary',
-          label: {
-            type: 'custom',
-            custom: {beneficiary: beneficiary.name, beneficiaryId: beneficiary.id, initiatorName:req.user.name, initiatorAccountNumber:req.user.accountNumber, transactionType:'Credit'},
-          },
-          type: 'text',
-        },
-      ],
+
   });
 
   res.status(200).json({
