@@ -27,8 +27,6 @@ console.log(beneficiaryId)
     customer_email: req.user.email,
     client_reference_id: beneficiary.id,
 
-    // metadata:{'beneficiary': beneficiary.id},
-//    metadata: {beneficiary: beneficiary.name, beneficiaryId: beneficiary.id, initiatorName:req.user.name, initiatorId:req.user.id, initiatorAccountNumber:req.user.accountNumber, transactionType:'Credit'},
     mode: 'payment',
     line_items: [
       {
@@ -62,7 +60,9 @@ exports.webhoookCheckout = catchAsync(async(req,res, next)=> {
   let event;
 
 
-  console.log(sig)
+  console.log({sig})
+
+  console.log({req})
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
@@ -75,7 +75,7 @@ exports.webhoookCheckout = catchAsync(async(req,res, next)=> {
     case 'payment_intent.succeeded':
       const paymentIntentSucceeded = event.data.object;
 
-handlePaymentCompleted(req.user.id, paymentIntentSucceeded)
+handlePaymentCompleted(req, paymentIntentSucceeded)
       // Then define and call a function to handle the event payment_intent.succeeded
       break;
 
