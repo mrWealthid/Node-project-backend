@@ -83,7 +83,7 @@ case 'checkout.session.completed':
       const checkoutSessionCompleted = event.data.object;
       // Then define and call a function to handle the event checkout.session.completed
 
-      handleSessionCompleted(checkoutSessionCompleted, req.user.id)
+      handleSessionCompleted(checkoutSessionCompleted)
       break;
 
     //   case 'checkout.session.async_payment_succeeded':
@@ -110,8 +110,8 @@ case 'checkout.session.completed':
 })
 
 
-function handleSessionCompleted(session, user) {
-console.log("User", user)
+function handleSessionCompleted(session) {
+
 console.log({SessionData :session})
 }
 
