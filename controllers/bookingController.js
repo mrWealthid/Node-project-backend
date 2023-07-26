@@ -129,8 +129,8 @@ console.log({userDetails})
 const initiator = userDetails.initiatorAccountNumber;
 const beneficiary = beneficiaryDetails.beneficiaryAccountNumber;
 
-if (initiator === beneficiary)
-  return next(new AppError("You can't Transfer to self", 404));
+// if (initiator === beneficiary)
+//   return next(new AppError("You can't Transfer to self", 404));
 
 
 
@@ -143,12 +143,10 @@ const payload = {
   user: beneficiary.id,
 };
 
-const doc = await Transaction.create(payload);
+await Transaction.create(payload);
+
+//settlement
 await Transaction.create({...payload, amount: session.amount * -1, transactionType:'Debit',  user: userDetails.id});
-
-
-
-
 
 
 }
