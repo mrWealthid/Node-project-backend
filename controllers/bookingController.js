@@ -43,7 +43,16 @@ console.log(beneficiaryId)
       },
     ],
 
-
+    custom_fields: [
+        {
+          key: 'beneficiary',
+          label: {
+            type: 'custom',
+            custom: beneficiary.id
+          },
+          type: 'text',
+        },
+      ],
   });
 
   res.status(200).json({
@@ -91,9 +100,9 @@ createBookingCheckout(req.user, paymentIntentSucceeded)
 })
 
 async function createBookingCheckout ( user, session)  {
-console.log(user)
-    console.log(session)
-    console.log(session.client_reference_id)
+console.log({user})
+    console.log({session})
+    console.log({client: session.client_reference_id})
 
     
 
