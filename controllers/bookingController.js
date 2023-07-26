@@ -10,7 +10,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
 const {amount, beneficiaryId} = req.params
 
-console.log(beneficiaryId)
+
 
 
   //Get currently booked user
@@ -18,7 +18,6 @@ console.log(beneficiaryId)
 
   //Get Checkout Session
 
-  console.log(beneficiary)
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
@@ -33,7 +32,7 @@ console.log(beneficiaryId)
       {
         price_data: {
           currency: 'usd',
-          unit_amount: amount * 100,
+          unit_amount: amount ,
           product_data: {
             name: `${beneficiary.name}`,
             description: beneficiary.accountNumber,
@@ -55,9 +54,7 @@ console.log(beneficiaryId)
 });
 
 exports.webhoookCheckout = catchAsync(async(req,res, next)=> {
-
       const sig = req.headers['stripe-signature'];
-
   let event;
 
   try {
@@ -109,16 +106,11 @@ case 'checkout.session.completed':
 
 async function  handleSessionCompleted(session) {
 
-
   const beneficiaryId = session.client_reference_id
   const email = session.customer_details.email
 
-
 const beneficiary=  await User.findById(beneficiaryId);
 const userDetails=  await User.find({email: email});
-
-
-console.log({userDetails: userDetails[0]})
 
 
 // const initiator = userDetails.initiatorAccountNumber;
@@ -133,7 +125,7 @@ const payload = {
   initiatorName: userDetails[0].name,
   beneficiaryAccountNumber:beneficiary.accountNumber,
   initiatorAccountNumber:userDetails[0].accountNumber,
-  amount: session.amount,
+  amount: session.amount_total,
   transactionType: 'Credit',
   user: beneficiary.id,
 };
@@ -146,37 +138,37 @@ await Transaction.create({...payload, amount: session.amount * -1, transactionTy
 
 }
 
-async function handlePaymentCompleted ( user, session)  {
-console.log({user})
-    console.log({session})
+// async function handlePaymentCompleted ( user, session)  {
+// console.log({user})
+//     console.log({session})
 
 
     
 
-    const data= session.metadata
-    const initiator = data.initiatorAccountNumber;
-    const beneficiary = data.beneficiaryAccountNumber;
+//     const data= session.metadata
+//     const initiator = data.initiatorAccountNumber;
+//     const beneficiary = data.beneficiaryAccountNumber;
   
-    if (initiator === beneficiary)
-      return next(new AppError("You can't Transfer to self", 404));
-    const settlement = {
-      ...data,
+//     if (initiator === beneficiary)
+//       return next(new AppError("You can't Transfer to self", 404));
+//     const settlement = {
+//       ...data,
   
-      amount: session.amount * -1,
-      transactionType: 'Debit',
-      user: data.initiatorId,
-    };
+//       amount: session.amount * -1,
+//       transactionType: 'Debit',
+//       user: data.initiatorId,
+//     };
   
-    const doc = await Transaction.create(data);
-    await Transaction.create(settlement);
+//     const doc = await Transaction.create(data);
+//     await Transaction.create(settlement);
   
    
 
-    res.status(201).json({
-      status: 'success',
-      data: { data: doc },
-    });
-}
+//     res.status(201).json({
+//       status: 'success',
+//       data: { data: doc },
+//     });
+// }
 // exports.createBookingCheckout = catchAsync(async (req, res, next) => {
 //   //THIS IS ONLY TEMPORARY BECAUSE EVERYONE CAN MAKE BOOKINGS WITHOUT PAYING
 
