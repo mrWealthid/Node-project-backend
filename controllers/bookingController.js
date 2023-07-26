@@ -25,7 +25,7 @@ console.log(beneficiaryId)
  
     cancel_url: `https://wealthtech.netlify.app/dashboard/payments`,
     customer_email: req.user.email,
-    client_reference_id: req.user.id,
+    client_reference_id: beneficiary.id,
    metadata: {beneficiary: beneficiary.name, beneficiaryId: beneficiary.id, initiatorName:req.user.name, initiatorId:req.user.id, initiatorAccountNumber:req.user.accountNumber, transactionType:'Credit'},
     mode: 'payment',
     line_items: [
@@ -70,7 +70,7 @@ exports.webhoookCheckout = catchAsync(async(req,res, next)=> {
   switch (event.type) {
     case 'payment_intent.succeeded':
       const paymentIntentSucceeded = event.data.object;
-createBookingCheckout(paymentIntentSucceeded)
+createBookingCheckout(req.user, paymentIntentSucceeded)
       // Then define and call a function to handle the event payment_intent.succeeded
       break;
     // ... handle other event types
@@ -87,28 +87,31 @@ createBookingCheckout(paymentIntentSucceeded)
 
 })
 
-async function createBookingCheckout (session)  {
+async function createBookingCheckout ( user, session)  {
+console.log(user)
+    console.log(session)
 
-    console.log(session.metadata)
+    
 
-    const data= session.metadata
-    const initiator = data.initiatorAccountNumber;
-    const beneficiary = data.beneficiaryAccountNumber;
+    // const data= session.metadata
+    // const initiator = data.initiatorAccountNumber;
+    // const beneficiary = data.beneficiaryAccountNumber;
   
-    if (initiator === beneficiary)
-      return next(new AppError("You can't Transfer to self", 404));
-    const settlement = {
-      ...data,
+    // if (initiator === beneficiary)
+    //   return next(new AppError("You can't Transfer to self", 404));
+    // const settlement = {
+    //   ...data,
   
-      amount: session.amount * -1,
-      transactionType: 'Debit',
-      user: data.initiatorId,
-    };
+    //   amount: session.amount * -1,
+    //   transactionType: 'Debit',
+    //   user: data.initiatorId,
+    // };
   
-    const doc = await Transaction.create(data);
-    await Transaction.create(settlement);
+    // const doc = await Transaction.create(data);
+    // await Transaction.create(settlement);
   
    
+
     res.status(201).json({
       status: 'success',
       data: { data: doc },
