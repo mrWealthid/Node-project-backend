@@ -26,6 +26,8 @@ console.log(beneficiaryId)
     cancel_url: `https://wealthtech.netlify.app/dashboard/payments`,
     customer_email: req.user.email,
     client_reference_id: beneficiary.id,
+
+    metadata:{'beneficiary': beneficiary.id},
 //    metadata: {beneficiary: beneficiary.name, beneficiaryId: beneficiary.id, initiatorName:req.user.name, initiatorId:req.user.id, initiatorAccountNumber:req.user.accountNumber, transactionType:'Credit'},
     mode: 'payment',
     line_items: [
@@ -43,16 +45,7 @@ console.log(beneficiaryId)
       },
     ],
 
-    custom_fields: [
-        {
-          key: 'beneficiary',
-          label: {
-            type: 'custom',
-            custom: beneficiary.id
-          },
-          type: 'text',
-        },
-      ],
+    
   });
 
   res.status(200).json({
@@ -82,9 +75,20 @@ exports.webhoookCheckout = catchAsync(async(req,res, next)=> {
     case 'payment_intent.succeeded':
       const paymentIntentSucceeded = event.data.object;
 
-createBookingCheckout(req.user, paymentIntentSucceeded)
+handlePaymentCompleted(req.user.id, paymentIntentSucceeded)
       // Then define and call a function to handle the event payment_intent.succeeded
       break;
+
+
+      case 'checkout.session.async_payment_succeeded':
+        const checkoutSessionAsyncPaymentSucceeded = event.data.object;
+
+
+        handleSessionCompleted(checkoutSessionAsyncPaymentSucceeded)
+        // Then define and call a function to handle the event checkout.session.async_payment_succeeded
+        break;
+      // ... handle other event types
+
     // ... handle other event types
     default:
       console.log(`Unhandled event type ${event.type}`);
@@ -99,10 +103,15 @@ createBookingCheckout(req.user, paymentIntentSucceeded)
 
 })
 
-async function createBookingCheckout ( user, session)  {
+
+function handleSessionCompleted(session) {
+console.log({SessionData :session})
+}
+
+async function handlePaymentCompleted ( user, session)  {
 console.log({user})
     console.log({session})
-    console.log({client: session.client_reference_id})
+
 
     
 
