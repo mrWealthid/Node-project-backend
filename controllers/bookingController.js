@@ -26,7 +26,7 @@ console.log(beneficiaryId)
     cancel_url: `https://wealthtech.netlify.app/dashboard/payments`,
     customer_email: req.user.email,
     client_reference_id: beneficiary.id,
-   metadata: {beneficiary: beneficiary.name, beneficiaryId: beneficiary.id, initiatorName:req.user.name, initiatorId:req.user.id, initiatorAccountNumber:req.user.accountNumber, transactionType:'Credit'},
+//    metadata: {beneficiary: beneficiary.name, beneficiaryId: beneficiary.id, initiatorName:req.user.name, initiatorId:req.user.id, initiatorAccountNumber:req.user.accountNumber, transactionType:'Credit'},
     mode: 'payment',
     line_items: [
       {
@@ -42,6 +42,17 @@ console.log(beneficiaryId)
         quantity: 1,
       },
     ],
+
+    custom_fields: [
+        {
+          key: 'beneficiary',
+          label: {
+            type: 'custom',
+            custom: {beneficiary: beneficiary.name, beneficiaryId: beneficiary.id, initiatorName:req.user.name, initiatorAccountNumber:req.user.accountNumber, transactionType:'Credit'},
+          },
+          type: 'text',
+        },
+      ],
   });
 
   res.status(200).json({
@@ -70,6 +81,7 @@ exports.webhoookCheckout = catchAsync(async(req,res, next)=> {
   switch (event.type) {
     case 'payment_intent.succeeded':
       const paymentIntentSucceeded = event.data.object;
+
 createBookingCheckout(req.user, paymentIntentSucceeded)
       // Then define and call a function to handle the event payment_intent.succeeded
       break;
@@ -90,6 +102,7 @@ createBookingCheckout(req.user, paymentIntentSucceeded)
 async function createBookingCheckout ( user, session)  {
 console.log(user)
     console.log(session)
+    console.log(session.client_reference_id)
 
     
 
@@ -112,10 +125,10 @@ console.log(user)
   
    
 
-    res.status(201).json({
-      status: 'success',
-      data: { data: doc },
-    });
+    // res.status(201).json({
+    //   status: 'success',
+    //   data: { data: doc },
+    // });
 }
 // exports.createBookingCheckout = catchAsync(async (req, res, next) => {
 //   //THIS IS ONLY TEMPORARY BECAUSE EVERYONE CAN MAKE BOOKINGS WITHOUT PAYING
