@@ -125,7 +125,7 @@ const payload = {
   initiatorName: userDetails[0].name,
   beneficiaryAccountNumber:beneficiary.accountNumber,
   initiatorAccountNumber:userDetails[0].accountNumber,
-  amount: session.amount_total,
+  amount: (session.amount_total/100),
   transactionType: 'Credit',
   user: beneficiary.id,
   createdAt:  new Date(Date.now())
@@ -134,7 +134,7 @@ const payload = {
 await Transaction.create(payload);
 
 //settlement
-await Transaction.create({...payload, amount: session.amount_total * -1, transactionType:'Debit',  user: userDetails[0].id});
+await Transaction.create({...payload, amount: (session.amount_total/100) * -1, transactionType:'Debit',  user: userDetails[0].id});
 
 
 }
