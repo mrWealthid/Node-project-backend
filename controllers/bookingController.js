@@ -110,9 +110,45 @@ case 'checkout.session.completed':
 })
 
 
-function handleSessionCompleted(session) {
+async function  handleSessionCompleted(session) {
 
-console.log({SessionData :session})
+
+  const beneficiaryId = session.client_reference_id
+  const email = session.email
+
+const beneficiaryDetails=  await User.findById(beneficiaryId);
+const userDetails=  await User.find(email);
+
+
+console.log({beneficiaryDetails})
+console.log({userDetails})
+
+
+const initiator = userDetails.initiatorAccountNumber;
+const beneficiary = beneficiaryDetails.beneficiaryAccountNumber;
+
+if (initiator === beneficiary)
+  return next(new AppError("You can't Transfer to self", 404));
+
+
+
+const payload = {
+  initiatorName: userDetails.name,
+  beneficiaryAccountNumber:beneficiary.beneficiaryAccountNumber,
+  initiatorAccountNumber:userDetails.initiatorAccountNumber,
+  amount: session.amount,
+  transactionType: 'Credit',
+  user: beneficiary.id,
+};
+
+const doc = await Transaction.create(payload);
+await Transaction.create({...payload, amount: session.amount * -1, transactionType:'Debit',  user: userDetails.id});
+
+
+
+
+
+
 }
 
 async function handlePaymentCompleted ( user, session)  {
@@ -122,29 +158,29 @@ console.log({user})
 
     
 
-    // const data= session.metadata
-    // const initiator = data.initiatorAccountNumber;
-    // const beneficiary = data.beneficiaryAccountNumber;
+    const data= session.metadata
+    const initiator = data.initiatorAccountNumber;
+    const beneficiary = data.beneficiaryAccountNumber;
   
-    // if (initiator === beneficiary)
-    //   return next(new AppError("You can't Transfer to self", 404));
-    // const settlement = {
-    //   ...data,
+    if (initiator === beneficiary)
+      return next(new AppError("You can't Transfer to self", 404));
+    const settlement = {
+      ...data,
   
-    //   amount: session.amount * -1,
-    //   transactionType: 'Debit',
-    //   user: data.initiatorId,
-    // };
+      amount: session.amount * -1,
+      transactionType: 'Debit',
+      user: data.initiatorId,
+    };
   
-    // const doc = await Transaction.create(data);
-    // await Transaction.create(settlement);
+    const doc = await Transaction.create(data);
+    await Transaction.create(settlement);
   
    
 
-    // res.status(201).json({
-    //   status: 'success',
-    //   data: { data: doc },
-    // });
+    res.status(201).json({
+      status: 'success',
+      data: { data: doc },
+    });
 }
 // exports.createBookingCheckout = catchAsync(async (req, res, next) => {
 //   //THIS IS ONLY TEMPORARY BECAUSE EVERYONE CAN MAKE BOOKINGS WITHOUT PAYING
