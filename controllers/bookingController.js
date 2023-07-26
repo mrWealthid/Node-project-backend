@@ -32,7 +32,7 @@ const {amount, beneficiaryId} = req.params
       {
         price_data: {
           currency: 'usd',
-          unit_amount: amount ,
+          unit_amount: amount* 1,
           product_data: {
             name: `${beneficiary.name}`,
             description: beneficiary.accountNumber,
@@ -133,7 +133,7 @@ const payload = {
 await Transaction.create(payload);
 
 //settlement
-await Transaction.create({...payload, amount: session.amount * -1, transactionType:'Debit',  user: userDetails[0].id});
+await Transaction.create({...payload, amount: session.amount_total * -1, transactionType:'Debit',  user: userDetails[0].id});
 
 
 }
