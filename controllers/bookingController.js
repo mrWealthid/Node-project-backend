@@ -116,18 +116,16 @@ async function  handleSessionCompleted(session) {
   const beneficiaryId = session.client_reference_id
   const email = session.customer_details.email
 
-  console.log('Email', email)
 
-const beneficiaryDetails=  await User.findById(beneficiaryId);
+const beneficiary=  await User.findById(beneficiaryId);
 const userDetails=  await User.find({email: email});
 
 
-console.log({beneficiaryDetails})
 console.log({userDetails})
 
 
-const initiator = userDetails.initiatorAccountNumber;
-const beneficiary = beneficiaryDetails.beneficiaryAccountNumber;
+// const initiator = userDetails.initiatorAccountNumber;
+// const beneficiary = beneficiaryDetails.beneficiaryAccountNumber;
 
 // if (initiator === beneficiary)
 //   return next(new AppError("You can't Transfer to self", 404));
@@ -135,9 +133,9 @@ const beneficiary = beneficiaryDetails.beneficiaryAccountNumber;
 
 
 const payload = {
-  initiatorName: userDetails.name,
-  beneficiaryAccountNumber:beneficiary.beneficiaryAccountNumber,
-  initiatorAccountNumber:userDetails.initiatorAccountNumber,
+  initiatorName: userDetails[0].name,
+  beneficiaryAccountNumber:beneficiary.accountNumber,
+  initiatorAccountNumber:userDetails[0].accountNumber,
   amount: session.amount,
   transactionType: 'Credit',
   user: beneficiary.id,
@@ -146,7 +144,7 @@ const payload = {
 await Transaction.create(payload);
 
 //settlement
-await Transaction.create({...payload, amount: session.amount * -1, transactionType:'Debit',  user: userDetails.id});
+await Transaction.create({...payload, amount: session.amount * -1, transactionType:'Debit',  user: userDetails[0].id});
 
 
 }
