@@ -43,7 +43,16 @@ console.log(beneficiaryId)
       },
     ],
 
-
+    custom_fields: [
+        {
+          key: 'beneficiary',
+          label: {
+            type: 'custom',
+            custom: beneficiary.id
+          },
+          type: 'text',
+        },
+      ],
   });
 
   res.status(200).json({
