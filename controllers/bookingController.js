@@ -79,14 +79,20 @@ exports.webhoookCheckout = catchAsync(async(req,res, next)=> {
 //       // Then define and call a function to handle the event payment_intent.succeeded
 //       break;
 
+case 'checkout.session.completed':
+      const checkoutSessionCompleted = event.data.object;
+      // Then define and call a function to handle the event checkout.session.completed
 
-      case 'checkout.session.async_payment_succeeded':
-        const checkoutSessionAsyncPaymentSucceeded = event.data.object;
+      handleSessionCompleted(checkoutSessionCompleted, req.user.id)
+      break;
+
+    //   case 'checkout.session.async_payment_succeeded':
+    //     const checkoutSessionAsyncPaymentSucceeded = event.data.object;
 
 
-        handleSessionCompleted(checkoutSessionAsyncPaymentSucceeded, req.user.id)
-        // Then define and call a function to handle the event checkout.session.async_payment_succeeded
-        break;
+    //     handleSessionCompleted(checkoutSessionAsyncPaymentSucceeded, req.user.id)
+    //     // Then define and call a function to handle the event checkout.session.async_payment_succeeded
+    //     break;
       // ... handle other event types
 
     // ... handle other event types
