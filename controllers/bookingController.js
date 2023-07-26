@@ -32,7 +32,7 @@ const {amount, beneficiaryId} = req.params
       {
         price_data: {
           currency: 'usd',
-          unit_amount: amount* 1,
+          unit_amount: amount* 100,
           product_data: {
             name: `${beneficiary.name}`,
             description: beneficiary.accountNumber,
@@ -128,6 +128,7 @@ const payload = {
   amount: session.amount_total,
   transactionType: 'Credit',
   user: beneficiary.id,
+  createdAt:  new Date(Date.now())
 };
 
 await Transaction.create(payload);
