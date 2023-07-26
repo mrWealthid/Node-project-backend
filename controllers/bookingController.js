@@ -114,7 +114,7 @@ async function  handleSessionCompleted(session) {
 
 
   const beneficiaryId = session.client_reference_id
-  const email = session.email
+  const email = session.customer_details.email
 
   console.log('Email', email)
 
