@@ -48,7 +48,7 @@ console.log(beneficiaryId)
           key: 'beneficiary',
           label: {
             type: 'custom',
-            custom: {beneficiary: beneficiary.name, beneficiaryId: beneficiary.id, initiatorName:req.user.name, initiatorAccountNumber:req.user.accountNumber, transactionType:'Credit'},
+            custom: beneficiary.id
           },
           type: 'text',
         },
