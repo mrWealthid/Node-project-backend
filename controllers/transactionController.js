@@ -520,6 +520,7 @@ case 'checkout.session.completed':
     amount: (session.amount_total/100),
     transactionType: 'Credit',
     user: user.id,
+    channel:'Card',
     createdAt:  new Date(Date.now())
   };
   

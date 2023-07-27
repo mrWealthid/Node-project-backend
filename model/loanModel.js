@@ -37,6 +37,12 @@ const loanSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
+
+    createdAt: {
+      type: Date,
+      default: Date.now(),
+      select: false,
+    },
     paymentStatus: {
       type: String,
       enum: ['UNPAID', 'PAID'],

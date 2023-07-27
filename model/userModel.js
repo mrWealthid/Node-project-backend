@@ -27,6 +27,12 @@ const userSchema = new mongoose.Schema(
       select: false,
     },
 
+    createdAt: {
+      type: Date,
+      default: Date.now(),
+      select: false,
+    },
+
     accountNumber: {
       type: Number,
       minlength: 7,

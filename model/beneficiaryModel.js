@@ -17,6 +17,7 @@ const beneficiarySchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
+    select: false,
   },
 });
 const Beneficiary = mongoose.model('Beneficiary', beneficiarySchema);

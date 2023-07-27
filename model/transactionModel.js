@@ -12,6 +12,13 @@ const transactionSchema = new mongoose.Schema(
       enum: ['Debit', 'Credit'],
       required: [true, 'Please specify transaction Type!'],
     },
+
+    channel: {
+      type: String,
+      enum: ['Transfer', 'Card'],
+      required: [true, 'Please specify transaction Channel!'],
+      default:'Transfer'
+    },
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
@@ -34,6 +41,16 @@ const transactionSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+
+
+transactionSchema.pre(/^find/, function (next) {
+  // this.find({ active: false });
+  this.find({ channel: { $ne: 'Card' } });
+  next();
+});
+
+
 
 const Transaction = mongoose.model('Transaction', transactionSchema);
 
