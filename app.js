@@ -18,6 +18,8 @@ const beneficiaryRouter = require('./routes/beneficiaryRoutes');
 const loanRouter = require('./routes/loanRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const bookingController = require('./controllers/bookingController');
+const transactionController = require('./controllers/transactionController');
+
 
 const filepath = path.join(process.cwd(), 'public');
 
@@ -65,7 +67,10 @@ app.use('/api', limiter);
 
 
 
-app.post('/webhook-checkout', bodyParser.raw({type: 'application/json'}) ,bookingController.webhoookCheckout )
+app.post('/payment-checkout', bodyParser.raw({type: 'application/json'}) ,transactionController.paymentCheckout )
+
+
+app.post('/walletfunding-checkout', bodyParser.raw({type: 'application/json'}) ,transactionController.fundingCheckout )
 
 //Body Parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
