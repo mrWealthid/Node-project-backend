@@ -16,13 +16,15 @@ const userRouter = require('./routes/userRoutes');
 const transactionRouter = require('./routes/transactionRoutes');
 const beneficiaryRouter = require('./routes/beneficiaryRoutes');
 const loanRouter = require('./routes/loanRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./controllers/bookingController');
 const transactionController = require('./controllers/transactionController');
 
 
 const filepath = path.join(process.cwd(), 'public');
 
 const app = express();
-
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 //To trust proxies
 // app.enable('trust proxy');
@@ -114,14 +116,44 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/transactions', transactionRouter);
 app.use('/api/v1/beneficiaries', beneficiaryRouter);
 app.use('/api/v1/loans', loanRouter);
-
+app.use('/api/v1/bookings', bookingRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`can't find ${req.originalUrl} on this server!`, 404));
 });
 
 
+const endpointSecret = "whsec_94a13cc381bcd2e2861af09a4043edae4f97c95421d0d3de595f8e981b724ac4";
 
+// app.post('/webhook', express.raw({type: 'application/json'}), (request, response) => {
+//   const sig = request.headers['stripe-signature'];
+
+//   let event;
+
+//   try {
+//     event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+//   } catch (err) {
+//     response.status(400).send(`Webhook Error: ${err.message}`);
+//     return;
+//   }
+
+//   // Handle the event
+//   switch (event.type) {
+//     case 'payment_intent.succeeded':
+//       const paymentIntentSucceeded = event.data.object;
+//       // Then define and call a function to handle the event payment_intent.succeeded
+//       break;
+//     // ... handle other event types
+//     default:
+//       console.log(`Unhandled event type ${event.type}`);
+//   }
+
+//   // Return a 200 response to acknowledge receipt of the event
+//   res.status(200).json({
+//     status: 'success',
+//     mesage:"Webhook Trigeered"
+//   });
+// });
 
 
 app.use(globalErrorHandler);
