@@ -472,12 +472,6 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         ],
 
 
-        payment_intent_data: {
-          metadata: {
-            source: "Funding"
-          
-          },
-        },
         
       });
     
