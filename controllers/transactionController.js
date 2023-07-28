@@ -362,7 +362,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         const checkoutSessionCompleted = event.data.object;
 
         const metadata = session.metadata;
-        console.log(metadata)
+        console.log({metadata})
 
       if (metadata && metadata.source === 'Payment') {
       handlePaymentSessionCompleted(checkoutSessionCompleted)
