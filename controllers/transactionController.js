@@ -299,9 +299,9 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
   
     //Get Checkout Session
   
-   await stripe.customers.create({
+ stripe.customers.create({
       metadata: {
-        source: 'Payment',
+        'source': 'Payment',
       },
     });
     const session = await stripe.checkout.sessions.create({
@@ -441,11 +441,12 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
   
     
       //Get Checkout Session
-     await stripe.customers.create({
+   stripe.customers.create({
         metadata: {
-        source:'Funding'
+        'source':'Funding'
         },
       });
+      
     
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -472,6 +473,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         ],
 
 
+      
         
       });
     
