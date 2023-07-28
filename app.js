@@ -68,7 +68,7 @@ app.use('/api', limiter);
 app.post('/payment-checkout', bodyParser.raw({type: 'application/json'}) ,transactionController.paymentCheckout )
 
 
-app.post('/walletfunding-checkout', bodyParser.raw({type: 'application/json'}) ,transactionController.fundingCheckout )
+// app.post('/walletfunding-checkout', bodyParser.raw({type: 'application/json'}) ,transactionController.fundingCheckout )
 
 //Body Parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));

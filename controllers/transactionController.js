@@ -356,6 +356,9 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         const checkoutSessionCompleted = event.data.object;
         // Then define and call a function to handle the event checkout.session.completed
   
+        console.log({EventObject:event.data.object})
+        console.log({request: req})
+
         handlePaymentSessionCompleted(checkoutSessionCompleted)
         break;
   
@@ -414,7 +417,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
 
 ///FUNDING WEBHOOKS
   exports.getFundingSession = catchAsync(async (req, res, next) => {
-    const uuid = crypto.randomUUID({ disableEntropyCache: true })
+  
 
     const {amount} = req.params
     
@@ -449,8 +452,6 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         ],
     
         
-      },{
-        idempotencyKey: uuid,
       });
     
       res.status(200).json({
@@ -460,41 +461,41 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
       //Create session as response
     });
 
-    exports.fundingCheckout = catchAsync(async(req,res, next)=> {
-      const sig = req.headers['stripe-signature'];
-  let event;
+//     exports.fundingCheckout = catchAsync(async(req,res, next)=> {
+//       const sig = req.headers['stripe-signature'];
+//   let event;
 
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_FUNDING_SECRET);
-  } catch (err) {
-    res.status(400).send(`Webhook Error: ${err.message}`);
-    return;
-  }
+//   try {
+//     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_FUNDING_SECRET);
+//   } catch (err) {
+//     res.status(400).send(`Webhook Error: ${err.message}`);
+//     return;
+//   }
 
-  // Handle the event
-  switch (event.type) {
-
-
-case 'checkout.session.completed':
-      const checkoutSessionCompleted = event.data.object;
-      // Then define and call a function to handle the event checkout.session.completed
-
-      handleFundingSessionCompleted(checkoutSessionCompleted)
-      break;
+//   // Handle the event
+//   switch (event.type) {
 
 
-    default:
-      console.log(`Unhandled event type ${event.type}`);
-  }
+// case 'checkout.session.completed':
+//       const checkoutSessionCompleted = event.data.object;
+//       // Then define and call a function to handle the event checkout.session.completed
 
-  // Return a 200 response to acknowledge receipt of the event
-  res.status(200).json({
-    status: 'success',
-    mesage: 'Recieved'
-  });
+//       handleFundingSessionCompleted(checkoutSessionCompleted)
+//       break;
 
 
-})
+//     default:
+//       console.log(`Unhandled event type ${event.type}`);
+//   }
+
+//   // Return a 200 response to acknowledge receipt of the event
+//   res.status(200).json({
+//     status: 'success',
+//     mesage: 'Recieved'
+//   });
+
+
+// })
 
   async function  handleFundingSessionCompleted(session) {
   
