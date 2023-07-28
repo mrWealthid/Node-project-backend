@@ -27,6 +27,13 @@ const transactionSchema = new mongoose.Schema(
       minlength: 7,
     },
 
+    channel: {
+      type: String,
+      enum: ['Transfer', 'Card'],
+      required: [true, 'Please specify transaction Channel!'],
+      default:'Transfer'
+    },
+
     createdAt: {
       type: Date,
       default: Date.now(),
