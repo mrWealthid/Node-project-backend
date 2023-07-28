@@ -7,15 +7,16 @@ const router = express.Router({ mergeParams: true });
 //Protect all route after this middleware
 router.use(authController.protect);
 router.get('/funding-session/:amount',transactionController.getFundingSession);
+
 router.get('/payment-session/:beneficiaryId/:amount',transactionController.getPaymentSession);
 
 router
   .route('/')
   .get(authController.protect, transactionController.getAllTransactions)
-  .post(
-    authController.restrictTo('user'),
-    transactionController.createTransaction
-  );
+  // .post(
+  //   authController.restrictTo('user'),
+  //   transactionController.createTransaction
+  // );
 
 router
   .route('/:id')

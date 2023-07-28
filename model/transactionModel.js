@@ -44,11 +44,11 @@ const transactionSchema = new mongoose.Schema(
 
 
 
-transactionSchema.pre(/^find/, function (next) {
-  // this.find({ active: false });
-  this.find({ channel: { $ne: 'Card' } });
-  next();
-});
+// transactionSchema.pre(/^find/, function (next) {
+//   // this.find({ active: false });
+//   this.find({ channel: { $ne: 'Card' } });
+//   next();
+// });
 
 
 

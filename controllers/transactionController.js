@@ -6,6 +6,7 @@ const User = require('../model/userModel');
 const factory = require('./handlerFactory');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const crypto = require("crypto")
 
 
 // exports.setTransUserIds = (req, res, next) => {
@@ -18,30 +19,30 @@ const AppError = require('../utils/appError');
 
 exports.getAllTransactions = factory.getAll(Transaction);
 exports.getTransaction = factory.getOne(Transaction);
-exports.createTransaction = catchAsync(async (req, res, next) => {
-  const initiator = req.body.initiatorAccountNumber;
-  const beneficiary = req.body.beneficiaryAccountNumber;
+// exports.createTransaction = catchAsync(async (req, res, next) => {
+//   const initiator = req.body.initiatorAccountNumber;
+//   const beneficiary = req.body.beneficiaryAccountNumber;
 
-  if (initiator === beneficiary)
-    return next(new AppError("You can't Transfer to self", 404));
-  const settlement = {
-    ...req.body,
+//   if (initiator === beneficiary)
+//     return next(new AppError("You can't Transfer to self", 404));
+//   const settlement = {
+//     ...req.body,
 
-    amount: req.body.amount * -1,
-    transactionType: 'Debit',
-    user: req.user.id,
-  };
+//     amount: req.body.amount * -1,
+//     transactionType: 'Debit',
+//     user: req.user.id,
+//   };
 
-  const doc = await Transaction.create(req.body);
-  await Transaction.create(settlement);
+//   const doc = await Transaction.create(req.body);
+//   await Transaction.create(settlement);
 
  
 
-  res.status(201).json({
-    status: 'success',
-    data: { data: doc },
-  });
-});
+//   res.status(201).json({
+//     status: 'success',
+//     data: { data: doc },
+//   });
+// });
 
 exports.deleteTransaction = factory.deleteOne(Transaction);
 exports.updateTransaction = factory.updateOne(Transaction);
@@ -291,7 +292,7 @@ exports.getUserBalance = catchAsync(async (req, res) => {
 ///Payment Webhooks
 
 exports.getPaymentSession = catchAsync(async (req, res, next) => {
-
+  const uuid = crypto.randomUUID({ disableEntropyCache: true })
   const {amount, beneficiaryId} = req.params
   
     //Get currently booked user
@@ -325,6 +326,8 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
       ],
   
       
+    }, {
+      idempotencyKey: uuid,
     });
   
     res.status(200).json({
@@ -347,12 +350,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
   
     // Handle the event
     switch (event.type) {
-  //     case 'payment_intent.succeeded':
-  //       const paymentIntentSucceeded = event.data.object;
-  
-  // handlePaymentCompleted(req, paymentIntentSucceeded)
-  //       // Then define and call a function to handle the event payment_intent.succeeded
-  //       break;
+ 
   
   case 'checkout.session.completed':
         const checkoutSessionCompleted = event.data.object;
@@ -361,16 +359,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         handlePaymentSessionCompleted(checkoutSessionCompleted)
         break;
   
-      //   case 'checkout.session.async_payment_succeeded':
-      //     const checkoutSessionAsyncPaymentSucceeded = event.data.object;
-  
-  
-      //     handleSessionCompleted(checkoutSessionAsyncPaymentSucceeded, req.user.id)
-      //     // Then define and call a function to handle the event checkout.session.async_payment_succeeded
-      //     break;
-        // ... handle other event types
-  
-      // ... handle other event types
+    
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
@@ -425,6 +414,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
 
 ///FUNDING WEBHOOKS
   exports.getFundingSession = catchAsync(async (req, res, next) => {
+    const uuid = crypto.randomUUID({ disableEntropyCache: true })
 
     const {amount} = req.params
     
@@ -459,6 +449,8 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         ],
     
         
+      },{
+        idempotencyKey: uuid,
       });
     
       res.status(200).json({
@@ -481,12 +473,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
 
   // Handle the event
   switch (event.type) {
-//     case 'payment_intent.succeeded':
-//       const paymentIntentSucceeded = event.data.object;
 
-// handlePaymentCompleted(req, paymentIntentSucceeded)
-//       // Then define and call a function to handle the event payment_intent.succeeded
-//       break;
 
 case 'checkout.session.completed':
       const checkoutSessionCompleted = event.data.object;
