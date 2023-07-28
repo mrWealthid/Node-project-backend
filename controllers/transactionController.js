@@ -292,7 +292,6 @@ exports.getUserBalance = catchAsync(async (req, res) => {
 ///Payment Webhooks
 
 exports.getPaymentSession = catchAsync(async (req, res, next) => {
-  const uuid = crypto.randomUUID({ disableEntropyCache: true })
   const {amount, beneficiaryId} = req.params
   
     //Get currently booked user
@@ -325,9 +324,10 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         },
       ],
   
+      metadata: {
+        source: "Payment"
       
-    }, {
-      idempotencyKey: uuid,
+      },
     });
   
     res.status(200).json({
@@ -348,18 +348,27 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
       return;
     }
   
+    console.log({EventObject:event.data.object})
+    console.log({request: req})
     // Handle the event
     switch (event.type) {
- 
-  
+
   case 'checkout.session.completed':
+
         const checkoutSessionCompleted = event.data.object;
         // Then define and call a function to handle the event checkout.session.completed
   
-        console.log({EventObject:event.data.object})
-        console.log({request: req})
+        const metadata = session.metadata;
 
-        handlePaymentSessionCompleted(checkoutSessionCompleted)
+        if (metadata && metadata.source === 'Payment') {
+          // Handle "My Funding" checkout completion
+          handlePaymentSessionCompleted(checkoutSessionCompleted)
+          // Your custom handling for "My Funding" here
+        } else {
+          // Handle "Payment" checkout completion
+         handleFundingSessionCompleted(checkoutSessionCompleted)
+          // Your custom handling for "Payment" here
+        }
         break;
   
     
@@ -450,7 +459,10 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
             quantity: 1,
           },
         ],
-    
+        metadata: {
+          source: "Funding"
+        
+        },
         
       });
     
