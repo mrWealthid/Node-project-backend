@@ -324,10 +324,13 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         },
       ],
   
-      metadata: {
-        source: "Payment"
-      
+      payment_intent_data: {
+        metadata: {
+          source: "Payment"
+        
+        },
       },
+     
     });
   
     res.status(200).json({
@@ -459,9 +462,13 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
             quantity: 1,
           },
         ],
-        metadata: {
-          source: "Funding"
-        
+
+
+        payment_intent_data: {
+          metadata: {
+            source: "Funding"
+          
+          },
         },
         
       });
