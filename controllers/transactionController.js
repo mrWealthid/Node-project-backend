@@ -323,12 +323,6 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         },
       ],
   
-      // payment_intent_data: {
-      //   metadata: {
-      //     source: "Payment"
-        
-      //   },
-      // },
      
     });
   
@@ -360,8 +354,6 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         const checkoutSessionCompleted = event.data.object;
         // Then define and call a function to handle the event checkout.session.completed
   
-        const metadata = session.metadata;
-console.log({metadata})
         // if (metadata && metadata.source === 'Payment') {
         //   // Handle "My Funding" checkout completion
         //   handlePaymentSessionCompleted(checkoutSessionCompleted)
@@ -371,6 +363,8 @@ console.log({metadata})
         //  handleFundingSessionCompleted(checkoutSessionCompleted)
         //   // Your custom handling for "Payment" here
         // }
+
+        console.log(checkoutSessionCompleted)
         break;
   
     
