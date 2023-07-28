@@ -299,7 +299,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
   
     //Get Checkout Session
   
- stripe.customers.create({
+ await stripe.customers.create({
       metadata: {
         'source': 'Payment',
       },
@@ -366,16 +366,16 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         // Then define and call a function to handle the event checkout.session.completed
   
         const metadata = session.metadata;
-
-        if (metadata && metadata.source === 'Payment') {
-          // Handle "My Funding" checkout completion
-          handlePaymentSessionCompleted(checkoutSessionCompleted)
-          // Your custom handling for "My Funding" here
-        } else {
-          // Handle "Payment" checkout completion
-         handleFundingSessionCompleted(checkoutSessionCompleted)
-          // Your custom handling for "Payment" here
-        }
+console.log({metadata})
+        // if (metadata && metadata.source === 'Payment') {
+        //   // Handle "My Funding" checkout completion
+        //   handlePaymentSessionCompleted(checkoutSessionCompleted)
+        //   // Your custom handling for "My Funding" here
+        // } else {
+        //   // Handle "Payment" checkout completion
+        //  handleFundingSessionCompleted(checkoutSessionCompleted)
+        //   // Your custom handling for "Payment" here
+        // }
         break;
   
     
@@ -441,7 +441,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
   
     
       //Get Checkout Session
-   stripe.customers.create({
+   await stripe.customers.create({
         metadata: {
         'source':'Funding'
         },
