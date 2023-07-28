@@ -299,11 +299,6 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
   
     //Get Checkout Session
   
- await stripe.customers.create({
-      metadata: {
-        'source': 'Payment',
-      },
-    });
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       success_url: `https://wealthtech.netlify.app/dashboard/payments`,
@@ -441,11 +436,7 @@ console.log({metadata})
   
     
       //Get Checkout Session
-   await stripe.customers.create({
-        metadata: {
-        'source':'Funding'
-        },
-      });
+ 
       
     
       const session = await stripe.checkout.sessions.create({
