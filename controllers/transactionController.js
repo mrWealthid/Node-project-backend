@@ -467,7 +467,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
 
 
         metadata: {
-          source:"Payment"
+          source:"Funding"
         }
        
         
