@@ -360,22 +360,18 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
   case 'checkout.session.completed':
 
         const checkoutSessionCompleted = event.data.object;
-        // Then define and call a function to handle the event checkout.session.completed
-  
-        // if (metadata && metadata.source === 'Payment') {
-        //   // Handle "My Funding" checkout completion
-        //   handlePaymentSessionCompleted(checkoutSessionCompleted)
-        //   // Your custom handling for "My Funding" here
-        // } else {
-        //   // Handle "Payment" checkout completion
-        //  handleFundingSessionCompleted(checkoutSessionCompleted)
-        //   // Your custom handling for "Payment" here
-        // }
 
-        console.log(checkoutSessionCompleted)
+        const metadata = session.metadata;
+        console.log(metadata)
+
+      if (metadata && metadata.source === 'Payment') {
+      handlePaymentSessionCompleted(checkoutSessionCompleted)
+      } else {
+      handleFundingSessionCompleted(checkoutSessionCompleted)
+       
+      }
         break;
-  
-    
+
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
