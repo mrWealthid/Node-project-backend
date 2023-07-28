@@ -12,13 +12,6 @@ const transactionSchema = new mongoose.Schema(
       enum: ['Debit', 'Credit'],
       required: [true, 'Please specify transaction Type!'],
     },
-
-    channel: {
-      type: String,
-      enum: ['Transfer', 'Card'],
-      required: [true, 'Please specify transaction Channel!'],
-      default:'Transfer'
-    },
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
