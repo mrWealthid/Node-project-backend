@@ -13,6 +13,10 @@ router
     beneficiaryController.createBeneficiary
   );
 
+
+
+
+  
 router
   .route('/:id')
   .get(beneficiaryController.getBeneficiary)

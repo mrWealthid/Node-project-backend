@@ -297,13 +297,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
     //Get currently booked user
     const beneficiary = await User.findById(beneficiaryId);
   
-    //Get Checkout Session
-  
-//  await stripe.customers.create({
-//       metadata: {
-//         source: 'Payment',
-//       },
-//     });
+    
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       success_url: `https://wealthtech.netlify.app/dashboard/payments`,
@@ -397,6 +391,9 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
   const userDetails=  await User.find({email: email});
   
   
+  console.log({beneficiary})
+
+  console.log({userDetails})
   // const initiator = userDetails.initiatorAccountNumber;
   // const beneficiary = beneficiaryDetails.beneficiaryAccountNumber;
   
@@ -414,7 +411,9 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
     user: beneficiary.id,
     createdAt:  new Date(Date.now())
   };
-  
+
+  console.log({payload: payload})
+
   await Transaction.create(payload);
   
   //settlement
@@ -431,14 +430,6 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
     const {amount} = req.params
     
     
-  
-    
-      //Get Checkout Session
-  //  await stripe.customers.create({
-  //       metadata: {
-  //       source:'Funding'
-  //       },
-  //     });
       
     
       const session = await stripe.checkout.sessions.create({
