@@ -60,6 +60,7 @@ module.exports = (err, req, res, next) => {
     if (err.name === 'TokenExpiredError') err = handleExpiredToken();
     sendErrorDev(res, err);
   } else if (process.env.NODE_ENV === 'production') {
+
     let error = { ...err };
 
     if (err.name === 'CastError') error = handleCastErrorDB(error);
@@ -70,6 +71,6 @@ module.exports = (err, req, res, next) => {
     if (error.name === 'JsonWebTokenError') error = handleJWTError();
 
     if (error.name === 'TokenExpiredError') error = handleExpiredToken();
-    sendErrorProd(res, error);
+    sendErrorProd(res, err);
   }
 };

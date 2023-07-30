@@ -346,8 +346,6 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
       return;
     }
   
-    console.log({EventObject:event.data.object})
-    console.log({request: req})
     // Handle the event
     switch (event.type) {
 
@@ -356,7 +354,8 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
         const checkoutSessionCompleted = event.data.object;
 
         const metadata = event.data.object.metadata;
-        console.log({metadata})
+      
+
 
       if (metadata && metadata.source === 'Payment') {
       handlePaymentSessionCompleted(checkoutSessionCompleted)
@@ -391,9 +390,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
   const userDetails=  await User.find({email: email});
   
   
-  console.log({beneficiary})
 
-  console.log({userDetails})
   // const initiator = userDetails.initiatorAccountNumber;
   // const beneficiary = beneficiaryDetails.beneficiaryAccountNumber;
   

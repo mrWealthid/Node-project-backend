@@ -23,8 +23,8 @@ const transactionController = require('./controllers/transactionController');
 const filepath = path.join(process.cwd(), 'public');
 
 const app = express();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+// process.env.NODE_ENV = 'production'
 //To trust proxies
 // app.enable('trust proxy');
 
@@ -54,6 +54,8 @@ app.options('*', cors());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+
 
 const limiter = rateLimit({
   max: 100,
