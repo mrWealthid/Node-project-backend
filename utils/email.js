@@ -13,7 +13,13 @@ module.exports = class Email {
   handleCreateTransport() {
     if (process.env.NODE_ENV === 'production') {
       //SEnd Grid
-      return 1;
+      return nodemailer.createTransport({
+        service:'SendGrid',
+        auth: {
+          user: process.env.SENDGRID_USERNAME,
+        pass:process.env.SENDGRID_PASSWORD
+        }
+      })
 
       //Couldn't implement Send Grid because my account wasn't created! Try to Implement later when account is approved!
     }
