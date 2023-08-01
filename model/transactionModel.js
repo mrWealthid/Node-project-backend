@@ -29,7 +29,7 @@ const transactionSchema = new mongoose.Schema(
 
     channel: {
       type: String,
-      enum: ['Transfer', 'Card'],
+      enum: ['Transfer', 'Card',],
       required: [true, 'Please specify transaction Channel!'],
       default:'Transfer'
     },

@@ -13,10 +13,10 @@ router.get('/payment-session/:beneficiaryId/:amount',transactionController.getPa
 router
   .route('/')
   .get(authController.protect, transactionController.getAllTransactions)
-  // .post(
-  //   authController.restrictTo('user'),
-  //   transactionController.createTransaction
-  // );
+  .post(
+    authController.restrictTo('user'),
+ transactionController.createTransaction
+  );
 
 router
   .route('/:id')

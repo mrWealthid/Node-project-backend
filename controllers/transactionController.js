@@ -19,30 +19,32 @@ const crypto = require("crypto")
 
 exports.getAllTransactions = factory.getAll(Transaction);
 exports.getTransaction = factory.getOne(Transaction);
-// exports.createTransaction = catchAsync(async (req, res, next) => {
-//   const initiator = req.body.initiatorAccountNumber;
-//   const beneficiary = req.body.beneficiaryAccountNumber;
 
-//   if (initiator === beneficiary)
-//     return next(new AppError("You can't Transfer to self", 404));
-//   const settlement = {
-//     ...req.body,
 
-//     amount: req.body.amount * -1,
-//     transactionType: 'Debit',
-//     user: req.user.id,
-//   };
+exports.createTransaction = catchAsync(async (req, res, next) => {
+  const initiator = req.body.initiatorAccountNumber;
+  const beneficiary = req.body.beneficiaryAccountNumber;
 
-//   const doc = await Transaction.create(req.body);
-//   await Transaction.create(settlement);
+  if (initiator === beneficiary)
+    return next(new AppError("You can't Transfer to self", 404));
+  const settlement = {
+    ...req.body,
+
+    amount: req.body.amount * -1,
+    transactionType: 'Debit',
+    user: req.user.id,
+  };
+
+  const doc = await Transaction.create(req.body);
+  await Transaction.create(settlement);
 
  
 
-//   res.status(201).json({
-//     status: 'success',
-//     data: { data: doc },
-//   });
-// });
+  res.status(201).json({
+    status: 'success',
+    data: { data: doc },
+  });
+});
 
 exports.deleteTransaction = factory.deleteOne(Transaction);
 exports.updateTransaction = factory.updateOne(Transaction);

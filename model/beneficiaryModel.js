@@ -12,6 +12,7 @@ const beneficiarySchema = new mongoose.Schema({
   accountNumber: {
     type: Number,
     minlength: 7,
+    unique: true,
   },
 
   createdAt: {
@@ -20,5 +21,10 @@ const beneficiarySchema = new mongoose.Schema({
     select: false,
   },
 });
+
+
+
+
 const Beneficiary = mongoose.model('Beneficiary', beneficiarySchema);
+// Beneficiary.init().then((x) => console.log(x));
 module.exports = Beneficiary;
