@@ -48,6 +48,14 @@ const loanSchema = new mongoose.Schema(
       enum: ['UNPAID', 'PAID'],
       default: 'UNPAID',
     },
+
+    payableAmount : {
+ type:Number,
+    }
+,
+    actionedBy : {
+      type:String,
+    }
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

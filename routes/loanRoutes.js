@@ -15,7 +15,7 @@ router
   .route('/:id')
   .get(loanController.getLoan)
   .delete(authController.restrictTo('admin', 'user'), loanController.deleteLoan)
-  .patch(authController.restrictTo('user', 'admin'), loanController.updateLoan);
+  .patch(authController.restrictTo( 'admin'), loanController.updateLoan);
 
 //Stats
 
