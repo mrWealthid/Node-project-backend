@@ -12,7 +12,6 @@ const beneficiarySchema = new mongoose.Schema({
   accountNumber: {
     type: Number,
     minlength: 7,
-    unique: true,
   },
 
   createdAt: {
