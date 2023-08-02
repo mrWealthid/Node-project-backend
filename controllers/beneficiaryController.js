@@ -16,11 +16,12 @@ exports.updateBeneficiary = factory.updateOne(Beneficiary);
 exports.deleteBeneficiary = factory.deleteOne(Beneficiary);
 exports.createBeneficiary = catchAsync(async (req, res, next) => {
 
-const beneficiaries =  await Beneficiary.find({user:req.user.id})
+const beneficiaries =  await Beneficiary.find({user:req.user.id}).find({accountNumber:req.body.accountNumber})
 
-const foundBeneficiary =beneficiaries.find((user)=> user.accountNumber === req.body.accountNumber)
+// console.log(beneficiaries)
+// const foundBeneficiary =beneficiaries.find((user)=> user.accountNumber === req.body.accountNumber)
 
-if(!foundBeneficiary)  {
+if(beneficiaries.length  === 0)  {
   const doc = await Beneficiary.create(req.body);
   res.status(201).json({
     status: 'success',
