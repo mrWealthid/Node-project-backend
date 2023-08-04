@@ -16,6 +16,8 @@ const {
   uploadUserPhoto,
   resizeUserPhoto,
   accountLookup,
+  getUserInsight,
+  getUserMonthlyStats,
 } = require('../controllers/userController');
 
 const router = express.Router();
@@ -38,6 +40,16 @@ router.delete('/deleteMe', deleteMe);
 
 //Protect all this route to only admins
 router.use(authController.restrictTo('admin'));
+
+
 router.route('/').get(getAllUsers);
+
+
+router.route('/user-stats').get(getUserInsight);
+
+router
+  .route('/monthly-stats/:type/:year')
+  .get(getUserMonthlyStats);
+
 router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
 module.exports = router;

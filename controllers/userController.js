@@ -4,6 +4,7 @@ const catchAsync = require('../utils/catchAsync');
 const User = require('../model/userModel');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
+const { Types } = require('mongoose');
 
 // const multerStorage = multer.diskStorage({
 //   destination: (req, file, cb) => {
@@ -116,5 +117,174 @@ exports.accountLookup = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: doc,
+  });
+});
+
+
+
+//User stats  
+
+
+
+exports.getUserInsight = catchAsync(async (req, res) => {
+
+
+  const stats = await User.aggregate([
+
+    {
+      $group: {
+        _id: '$role',
+        totalCount:{ $sum: 1 },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        result: {
+          $push: {
+            k: '$_id',
+            v: {
+              role: '$role',
+              totalCount: '$totalCount',
+            },
+          },
+        },
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: { $arrayToObject: '$result' },
+      },
+    },
+    // { $addFields: { type: '$_id' } },
+
+    // {
+    //   $project: { _id: 0 },
+    // },
+
+    { $limit: 12 },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: stats,
+    
+  });
+});
+
+
+
+exports.getUserMonthlyStats = catchAsync(async (req, res) => {
+  const year = req.params.year * 1;
+  const { type } = req.params;
+
+  const isAdmin = req.user.role === 'admin';
+
+  const stats = await User.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: new Date(`${year}-01-01`),
+          $lte: new Date(`${year}-12-31`),
+        },
+
+        $or: [
+          {
+            $and: [{ user: { $eq: new Types.ObjectId(req.user.id) } }],
+          },
+          {
+            $expr: {
+              $eq: [isAdmin, true],
+            },
+          },
+        ],
+        role: {
+          $eq: `${type}`,
+        },
+      },
+    },
+
+    {
+      $group: {
+        _id: {
+          $switch: {
+            branches: [
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 1] },
+                then: { month: 'January', monthNum: 1 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 2] },
+                then: { month: 'February', monthNum: 2 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 3] },
+                then: { month: 'March', monthNum: 3 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 4] },
+                then: { month: 'April', monthNum: 4 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 5] },
+                then: { month: 'May', monthNum: 5 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 6] },
+                then: { month: 'June', monthNum: 6 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 7] },
+                then: { month: 'July', monthNum: 7 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 8] },
+                then: { month: 'August', monthNum: 8 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 9] },
+                then: { month: 'September', monthNum: 9 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 10] },
+                then: { month: 'October', monthNum: 10 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 11] },
+                then: { month: 'November', monthNum: 11 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 12] },
+                then: { month: 'December', monthNum: 12 },
+              },
+            ],
+            default: 'Invalid',
+          },
+        },
+        totalCount: { $sum: 1 },
+        // transactions: { $addToSet: '$amount' },
+        users: { $push: '$name' },
+      
+      },
+    },
+    { $addFields: { time: '$_id' } },
+
+    {
+      $project: { _id: 0 },
+    },
+    {
+      $sort: {
+        'time.monthNum': 1,
+      },
+    },
+    { $limit: 12 },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      stats,
+    },
+  
   });
 });

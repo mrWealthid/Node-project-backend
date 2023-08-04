@@ -45,11 +45,20 @@ exports.getLoanStats = catchAsync(async (req, res) => {
 
 
   
-  // const isAdmin = req.user.role === 'admin';
+  const isAdmin = req.user.role === 'admin';
   const stats = await Loan.aggregate([
     {
       $match: {
-        user: { $eq: new Types.ObjectId(req.user.id) },
+        $or: [
+          {
+            $and: [{ user: { $eq: new Types.ObjectId(req.user.id) } }],
+          },
+          {
+            $expr: {
+              $eq: [isAdmin, true],
+            },
+          },
+        ],
       },
     },
     {
@@ -113,3 +122,121 @@ exports.getLoanStats = catchAsync(async (req, res) => {
     data: stats
   });
 });
+
+exports.getLoanMonthlyStats = catchAsync(async (req, res) => {
+  const year = req.params.year * 1;
+  const { type } = req.params;
+
+  const isAdmin = req.user.role === 'admin';
+
+  const stats = await Loan.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: new Date(`${year}-01-01`),
+          $lte: new Date(`${year}-12-31`),
+        },
+
+        $or: [
+          {
+            $and: [{ user: { $eq: new Types.ObjectId(req.user.id) } }],
+          },
+          {
+            $expr: {
+              $eq: [isAdmin, true],
+            },
+          },
+        ],
+        status: {
+          $eq: `${type}`,
+        },
+      },
+    },
+
+    {
+      $group: {
+        _id: {
+          $switch: {
+            branches: [
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 1] },
+                then: { month: 'January', monthNum: 1 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 2] },
+                then: { month: 'February', monthNum: 2 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 3] },
+                then: { month: 'March', monthNum: 3 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 4] },
+                then: { month: 'April', monthNum: 4 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 5] },
+                then: { month: 'May', monthNum: 5 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 6] },
+                then: { month: 'June', monthNum: 6 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 7] },
+                then: { month: 'July', monthNum: 7 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 8] },
+                then: { month: 'August', monthNum: 8 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 9] },
+                then: { month: 'September', monthNum: 9 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 10] },
+                then: { month: 'October', monthNum: 10 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 11] },
+                then: { month: 'November', monthNum: 11 },
+              },
+              {
+                case: { $eq: [{ $month: '$createdAt' }, 12] },
+                then: { month: 'December', monthNum: 12 },
+              },
+            ],
+            default: 'Invalid',
+          },
+        },
+        totalCount: { $sum: 1 },
+        // transactions: { $addToSet: '$amount' },
+        users: { $push: '$name' },
+      
+      },
+    },
+    { $addFields: { time: '$_id' } },
+
+    {
+      $project: { _id: 0 },
+    },
+    {
+      $sort: {
+        'time.monthNum': 1,
+      },
+    },
+    { $limit: 12 },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      stats,
+    },
+  
+  });
+});
+
+
+
