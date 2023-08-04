@@ -18,6 +18,16 @@ router
  transactionController.createTransaction
   );
 
+
+
+  router
+  .route('/monthly-highlights')
+  .get(transactionController.getMonthlyTransactionHighlight);
+
+router
+  .route('/daily-highlights')
+  .get(transactionController.getTodayTransactionHighlight);
+  
 router
   .route('/:id')
   .get(transactionController.getTransaction)
@@ -41,5 +51,7 @@ router
 router
   .route('/stats/:type/:time')
   .get(transactionController.getTransactionStats);
+
+
 
 module.exports = router;

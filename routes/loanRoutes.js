@@ -11,6 +11,7 @@ router
   .get(authController.protect, loanController.getAllLoans)
   .post(authController.restrictTo('user'), loanController.createLoan);
 
+  router.route('/loan-stats').get(loanController.getLoanStats);
 router
   .route('/:id')
   .get(loanController.getLoan)
@@ -19,7 +20,7 @@ router
 
 //Stats
 
-// router.route('/user/balance').get(loanController.getUserBalance);
+
 //
 // router
 //   .route('/monthly-stats/:type/:year')

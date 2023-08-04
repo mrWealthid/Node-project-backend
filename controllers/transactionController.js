@@ -6,7 +6,7 @@ const User = require('../model/userModel');
 const factory = require('./handlerFactory');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const crypto = require("crypto")
+
 
 
 // exports.setTransUserIds = (req, res, next) => {
@@ -291,6 +291,168 @@ userId =  req.user.id
   });
 });
 
+
+
+
+
+
+exports.getTodayTransactionHighlight = catchAsync(async (req, res) => {
+
+  const isAdmin = req.user.role === 'admin';
+
+  const currentDate = new Date();
+  const startOfToday = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+  const endOfToday = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1);
+  
+
+  const stats = await Transaction.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: startOfToday, // Greater than or equal to the start of today
+          $lt: endOfToday,    // Less than the start of tomorrow (end of today)
+        },
+        $or: [
+          {
+            $and: [{ user: { $eq: new Types.ObjectId(req.user.id) } }],
+          },
+          {
+            $expr: {
+              $eq: [isAdmin, true],
+            },
+          },
+        ],
+      },
+    },
+
+    // {
+    //   $group: {
+    //     _id: '$transactionType',
+    //     // transactions: { $addToSet: '$amount' },
+    //     transactions: { $push: '$amount' },
+    //     totalAmount: { $sum: '$amount' },
+    //   },
+    // },
+
+    {
+      $group: {
+        _id: '$transactionType',
+        transactions: { $push: '$amount' },
+        totalAmount: { $sum: '$amount' },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        result: {
+          $push: {
+            k: '$_id',
+            v: {
+              transactions: '$transactions',
+              totalAmount: '$totalAmount',
+            },
+          },
+        },
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: { $arrayToObject: '$result' },
+      },
+    },
+    // { $addFields: { type: '$_id' } },
+
+    // {
+    //   $project: { _id: 0 },
+    // },
+
+    { $limit: 12 },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: stats,
+    
+  });
+});
+exports.getMonthlyTransactionHighlight = catchAsync(async (req, res) => {
+
+  const isAdmin = req.user.role === 'admin';
+
+  const currentDate = new Date();
+const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+
+  const stats = await Transaction.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: startOfMonth, // Greater than or equal to the start of today
+          $lt: endOfMonth,    // Less than the start of tomorrow (end of today)
+        },
+        $or: [
+          {
+            $and: [{ user: { $eq: new Types.ObjectId(req.user.id) } }],
+          },
+          {
+            $expr: {
+              $eq: [isAdmin, true],
+            },
+          },
+        ],
+      },
+    },
+
+    // {
+    //   $group: {
+    //     _id: '$transactionType',
+    //     // transactions: { $addToSet: '$amount' },
+    //     transactions: { $push: '$amount' },
+    //     totalAmount: { $sum: '$amount' },
+    //   },
+    // },
+
+    {
+      $group: {
+        _id: '$transactionType',
+        transactions: { $push: '$amount' },
+        totalAmount: { $sum: '$amount' },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        result: {
+          $push: {
+            k: '$_id',
+            v: {
+              transactions: '$transactions',
+              totalAmount: '$totalAmount',
+            },
+          },
+        },
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: { $arrayToObject: '$result' },
+      },
+    },
+    // { $addFields: { type: '$_id' } },
+
+    // {
+    //   $project: { _id: 0 },
+    // },
+
+    { $limit: 12 },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data:  stats,
+  
+  });
+});
 
 
 // WEBHOOOKS================================>

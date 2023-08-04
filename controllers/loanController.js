@@ -2,6 +2,7 @@ const Loan = require('../model/loanModel');
 const Transaction = require('../model/transactionModel');
 const factory = require('./handlerFactory');
 const catchAsync = require('../utils/catchAsync');
+const { Types } = require('mongoose');
 
 exports.getMe = (req, res, next) => {
   req.params.id = req.user.id;
@@ -38,3 +39,77 @@ if(req.body.status === "APPROVED") await Transaction.create(payload)
   })});
 exports.deleteLoan = factory.deleteOne(Loan);
 exports.createLoan = factory.createOne(Loan);
+
+
+exports.getLoanStats = catchAsync(async (req, res) => {
+
+
+  
+  // const isAdmin = req.user.role === 'admin';
+  const stats = await Loan.aggregate([
+    {
+      $match: {
+        user: { $eq: new Types.ObjectId(req.user.id) },
+      },
+    },
+    {
+      $group: {
+        _id: '$status',
+        totalCount:{ $sum: 1 },
+        // name: '$_id'
+      },
+    },
+
+    {
+      $group: {
+        _id: null,
+        result: {
+          $push: {
+            k: '$_id',
+            v: {
+              status: '$transactions',
+              totalCount: '$totalCount',
+            },
+          },
+        },
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: { $arrayToObject: '$result' },
+      },
+    },
+
+
+    // {
+    //   $group: {
+    //     // _id: '$difficulty',
+    //     _id: { $toUpper: '$difficulty' },
+    //     // _id: '$ratingAverage',
+    //     numTours: { $sum: 1 },
+    //     numRatings: { $sum: '$ratingQuantity' },
+    //     avgRating: { $avg: '$ratingAverage' },
+    //     avgPrice: { $avg: '$price' },
+    //     minPrice: { $min: '$price' },
+    //     maxPrice: { $max: '$price' },
+    //   },
+    // },
+   
+
+  
+
+     {
+      $project: {
+        _id: 0,
+  
+      },
+    },
+
+    { $limit: 12 },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: stats
+  });
+});
