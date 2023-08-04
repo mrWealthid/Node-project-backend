@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const authController = require('../controllers/authController');
 const transactionRouter = require('./transactionRoutes');
+const loanRouter = require('./loanRoutes');
 
 const {
   getUser,
@@ -20,6 +21,7 @@ const {
 const router = express.Router();
 
 router.use('/:userId/transactions', transactionRouter);
+router.use('/:userId/loans', loanRouter);
 
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);

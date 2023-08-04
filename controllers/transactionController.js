@@ -255,11 +255,16 @@ exports.getTransactionStats = catchAsync(async (req, res) => {
 });
 
 exports.getUserBalance = catchAsync(async (req, res) => {
+
+  let {userId}= req.query
+  if(!userId) {
+userId =  req.user.id
+  }
   // const isAdmin = req.user.role === 'admin';
   const stats = await Transaction.aggregate([
     {
       $match: {
-        user: { $eq: new Types.ObjectId(req.user.id) },
+        user: { $eq: new Types.ObjectId(userId) },
       },
     },
     {
