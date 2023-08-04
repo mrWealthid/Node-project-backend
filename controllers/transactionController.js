@@ -403,14 +403,7 @@ const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 
       },
     },
 
-    // {
-    //   $group: {
-    //     _id: '$transactionType',
-    //     // transactions: { $addToSet: '$amount' },
-    //     transactions: { $push: '$amount' },
-    //     totalAmount: { $sum: '$amount' },
-    //   },
-    // },
+ 
 
     {
       $group: {
