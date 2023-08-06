@@ -15,13 +15,13 @@ module.exports = class Email {
   handleCreateTransport() {
     if (process.env.NODE_ENV === 'production') {
       //SEnd Grid
-      return nodemailer.createTransport({
-        service:'SendGrid',
-        auth: {
-          user: process.env.SENDGRID_USERNAME,
-        pass:process.env.SENDGRID_PASSWORD
-        }
-      })
+      // return nodemailer.createTransport({
+      //   service:'SendGrid',
+      //   auth: {
+      //     user: process.env.SENDGRID_USERNAME,
+      //   pass:process.env.SENDGRID_PASSWORD
+      //   }
+      // })
 
       //Couldn't implement Send Grid because my account wasn't created! Try to Implement later when account is approved!
     }
@@ -43,12 +43,12 @@ module.exports = class Email {
   async handleWebAPI(msg) {
     return  await sgMail
     .send(msg)
-    // .then(() => {
-    //   console.log('Email sent')
-    // })
-    // .catch((error) => {
-    //   console.error(error)
-    // })
+    .then(() => {
+      console.log('Email sent')
+    })
+    .catch((error) => {
+      console.error(error)
+    })
   }
 
   async send(template, subject) {
