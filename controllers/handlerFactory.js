@@ -53,10 +53,12 @@ exports.getOne = (Model, popOptions) =>
     });
   });
 
+
 exports.getAll = (Model) =>
   catchAsync(async (req, res, next) => {
     //To allow for nested get review on tour -Hack
     let filter = {};
+    let includeAll = true
 
     // console.log(req.user);
     // if (req.params.tourId) filter = { tour: req.params.tourId };
@@ -71,8 +73,30 @@ exports.getAll = (Model) =>
     //Execute Query
     // const doc = await features.query.explain();
     const doc = await features.query;
+let count;
 
-    const count = await Model.count(filter);
+
+
+// console.log( await Model.find(req.query))
+
+
+  
+
+
+
+//I did this because pagination of filtered data was impossible, The endpoint keeps returning the total count of all document
+
+if(Object.values(req.query).length > 0) {
+  console.log({before: req.query})
+  const excludedFields = ['page', 'sort', 'limit', 'fields'];
+  excludedFields.forEach((el) => delete req.query[el]);
+  console.log({after:req.query})
+count = await Model.find(filter).find(req.query).count()
+}
+else  {
+count=  await Model.count(filter)
+}
+
 
     //Send Response
     res.status(200).json({
