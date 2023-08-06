@@ -87,10 +87,8 @@ let count;
 //I did this because pagination of filtered data was impossible, The endpoint keeps returning the total count of all document
 
 if(Object.values(req.query).length > 0) {
-  console.log({before: req.query})
   const excludedFields = ['page', 'sort', 'limit', 'fields'];
   excludedFields.forEach((el) => delete req.query[el]);
-  console.log({after:req.query})
 count = await Model.find(filter).find(req.query).count()
 }
 else  {
