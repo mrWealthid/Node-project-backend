@@ -63,11 +63,13 @@ exports.signup = catchAsync(async (req, res) => {
     accountNumber: generateUniqueAccountNumber(),
     dateOfBirth: req.body.dateOfBirth,
   });
-  const url = `${req.protocol}://${req.get('host')}/me`;
+  // const url = `${req.protocol}://${req.get('host')}/me`;
+  const url = `https://wealthtech.netlify.app/dashboard`
 
   console.log(url)
 
   await new Email(newUser, url).sendWelcome();
+  
   createSendToken(newUser, 201, req, res);
   
 });

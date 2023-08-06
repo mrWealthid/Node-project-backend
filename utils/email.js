@@ -1,6 +1,8 @@
 const nodemailer = require('nodemailer');
 const pug = require('pug');
 const htmlToText = require('html-to-text');
+const sgMail = require('@sendgrid/mail')
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 module.exports = class Email {
   constructor(user, url) {
@@ -66,4 +68,24 @@ module.exports = class Email {
       'Your password reset token (valid for only 10 minutes)'
     );
   }
+
+
+
+sendMyMail() {
+const msg = {
+  to: 'mygee@mailsac.com', // Change to your recipient
+  from: 'test@example.com', // Change to your verified sender
+  subject: 'Sending with SendGrid is Fun',
+  text: 'and easy to do anywhere, even with Node.js',
+  html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+}
+sgMail
+  .send(msg)
+  .then(() => {
+    console.log('Email sent')
+  })
+  .catch((error) => {
+    console.error(error)
+  })
+}
 };
