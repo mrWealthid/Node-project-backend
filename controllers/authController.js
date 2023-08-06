@@ -160,22 +160,22 @@ exports.forgotPassword = async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
 
   if (!user) {
-    return next(new AppError('There is no user with emails address.', 400));
+    return next(new AppError('There is no user with email address.', 400));
   }
   //2) Generate the random reset token
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
   try {
+
+
     //3) Send it to user's emails
     const resetURL = `${req.protocol}://${req.get(
       'host'
-    )}/api/v1/users/resetPassword/${resetToken}`;
+    )}/auth/resetPassword/${resetToken}`;
 
-    // const resetURL = `${req.protocol}://${req.get(
-    //   'host'
-    // )}/resetPassword/${resetToken}`;
-
+  
+console.log(resetURL)
     await new Email(user, resetURL).sendPasswordReset();
     res.status(200).json({
       status: 'success',
