@@ -37,6 +37,20 @@ module.exports = class Email {
     });
   }
 
+
+  //configuring with WEB APIS
+
+  async handleWebAPI(msg) {
+    return  await sgMail
+    .send(msg)
+    // .then(() => {
+    //   console.log('Email sent')
+    // })
+    // .catch((error) => {
+    //   console.error(error)
+    // })
+  }
+
   async send(template, subject) {
     //Send the actual emails
     //1) Render HTML, based on a pug template
@@ -55,11 +69,13 @@ module.exports = class Email {
     };
 
     //3 Create a transport and send emails
-    await this.handleCreateTransport().sendMail(mailOptions);
+    // await this.handleCreateTransport().sendMail(mailOptions);
+
+    await this.handleWebAPI(mailOptions)
   }
 
   async sendWelcome() {
-    await this.send('welcome', 'Welcome to the Natours Family');
+    await this.send('welcome', 'Welcome to the Wealth_Wallet');
   }
 
   async sendPasswordReset() {
@@ -71,21 +87,21 @@ module.exports = class Email {
 
 
 
-sendMyMail() {
-const msg = {
-  to: 'mygee@mailsac.com', // Change to your recipient
-  from: 'test@example.com', // Change to your verified sender
-  subject: 'Sending with SendGrid is Fun',
-  text: 'and easy to do anywhere, even with Node.js',
-  html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-}
-sgMail
-  .send(msg)
-  .then(() => {
-    console.log('Email sent')
-  })
-  .catch((error) => {
-    console.error(error)
-  })
-}
+// sendMyMail() {
+// const msg = {
+//   to: 'mygee@mailsac.com', // Change to your recipient
+//   from: 'support@em4491.wealthtech.website', // Change to your verified sender
+//   subject: 'Sending with SendGrid is Fun',
+//   text: 'and easy to do anywhere, even with Node.js',
+//   html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+// }
+// sgMail
+//   .send(msg)
+//   .then(() => {
+//     console.log('Email sent')
+//   })
+//   .catch((error) => {
+//     console.error(error)
+//   })
+// }
 };
