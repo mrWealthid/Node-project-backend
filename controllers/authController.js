@@ -168,11 +168,19 @@ exports.forgotPassword = async (req, res, next) => {
 
   try {
 
+    let resetURL;
+
+    if(process.env ==='development') {
+resetURL = `http://192.168.1.3:4200/auth/updatePassword/${resetToken}`
+    }
+    else {
+resetURL = `https://bank-app.wealthtech.website/auth/updatePassword/${resetToken}`
+    }
 
     //3) Send it to user's emails
-    const resetURL = `${req.protocol}://${req.get(
-      'host'
-    )}/auth/resetPassword/${resetToken}`;
+    // const resetURL = `${req.protocol}://${req.get(
+    //   'host'
+    // )}/auth/resetPassword/${resetToken}`;
 
   
 console.log(resetURL)
