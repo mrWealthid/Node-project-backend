@@ -261,7 +261,7 @@ exports.getUserMonthlyStats = catchAsync(async (req, res) => {
             default: 'Invalid',
           },
         },
-        total: { $sum: 1 },
+        totalCount: { $sum: 1 },
         // transactions: { $addToSet: '$amount' },
         users: { $push: '$name' },
       
