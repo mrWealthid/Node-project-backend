@@ -60,7 +60,7 @@ exports.getMe = (req, res, next) => {
 };
 
 exports.getAllUsers = factory.getAll(User);
-exports.getUser = factory.getOne(User, { path: 'transactions' });
+exports.getUser = factory.getOne(User);
 
 //Don't try to update users password using this endpoint even as an admin
 exports.updateUser = factory.updateOne(User);
@@ -261,7 +261,7 @@ exports.getUserMonthlyStats = catchAsync(async (req, res) => {
             default: 'Invalid',
           },
         },
-        totalCount: { $sum: 1 },
+        total: { $sum: 1 },
         // transactions: { $addToSet: '$amount' },
         users: { $push: '$name' },
       
