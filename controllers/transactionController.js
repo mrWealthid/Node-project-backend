@@ -576,7 +576,7 @@ exports.getPaymentSession = catchAsync(async (req, res, next) => {
   await Transaction.create(payload);
   
   //settlement
-  await Transaction.create({...payload, amount: (session.amount_total/100) * -1, transactionType:'Debit',  user: userDetails[0].id});
+  // await Transaction.create({...payload, amount: (session.amount_total/100) * -1, transactionType:'Debit',  user: userDetails[0].id});
   
   
   }
