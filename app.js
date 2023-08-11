@@ -238,10 +238,8 @@ app.get('/auth/google',
 });
 const token =signToken(req.user._id)
 
-console.log(process.env.GOOGLE_SUCCESS_URL/`?token=${token}`)
-
     // Successful authentication redirects to the client application with jwt 
-    res.redirect(process.env.GOOGLE_SUCCESS_URL/`?token=${token}`);
+    res.redirect(`${process.env.GOOGLE_SUCCESS_URL}/?token=${token}`);
   });
 
 

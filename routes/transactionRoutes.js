@@ -47,6 +47,9 @@ router.route('/user/balance').get(transactionController.getUserBalance);
 router
   .route('/monthly-stats/:type/:year')
   .get(transactionController.getTransactionMonthlyStats);
+router
+  .route('/monthlyChannel-stats/:type/:year')
+  .get(transactionController.getTransactionChannelMonthlyStats);
 
 router
   .route('/stats/:type/:time')
