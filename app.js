@@ -22,6 +22,7 @@ const transactionController = require('./controllers/transactionController');
 const passport = require('passport')
 const session = require('express-session')
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const MemoryStore = require('memorystore')(session)
 
 
 const filepath = path.join(process.cwd(), 'public');
@@ -129,6 +130,7 @@ app.use(session({
       checkPeriod: 86400000 // prune expired entries every 24h
     }),
     resave: false,
+    saveUninitialized: true,
 }));
 
 // Initialize Passport
@@ -235,6 +237,8 @@ app.get('/auth/google',
       expiresIn: process.env.JWT_EXPIRES_IN,
 });
 const token =signToken(req.user._id)
+
+console.log(process.env.GOOGLE_SUCCESS_URL/`?token=${token}`)
 
     // Successful authentication redirects to the client application with jwt 
     res.redirect(process.env.GOOGLE_SUCCESS_URL/`?token=${token}`);
