@@ -237,6 +237,7 @@ app.get('/auth/google',
       expiresIn: process.env.JWT_EXPIRES_IN,
 });
 const token =signToken(req.user._id)
+console.log({myRoute: `${process.env.GOOGLE_SUCCESS_URL}/?token=${token}`})
 
     // Successful authentication redirects to the client application with jwt 
     res.redirect(`${process.env.GOOGLE_SUCCESS_URL}/?token=${token}`);
