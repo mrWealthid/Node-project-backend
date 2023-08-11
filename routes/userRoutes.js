@@ -25,6 +25,7 @@ const router = express.Router();
 router.use('/:userId/transactions', transactionRouter);
 router.use('/:userId/loans', loanRouter);
 
+  
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
 router.post('/forgotPassword', authController.forgotPassword);

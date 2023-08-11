@@ -22,11 +22,15 @@ const userSchema = new mongoose.Schema(
 
     password: {
       type: String,
-      required: [true, 'Please provide a password'],
+      // required: [true, 'Please provide a password'],
       minlength: 8,
       select: false,
     },
 
+    googleId : {
+      type:String
+    }
+,
     createdAt: {
       type: Date,
       default: Date.now(),
@@ -40,11 +44,11 @@ const userSchema = new mongoose.Schema(
 
     dateOfBirth: {
       type: Date,
-      required: [true, 'Please add date of birth'],
+      // required: [true, 'Please add date of birth'],
     },
     passwordConfirm: {
       type: String,
-      required: [true, 'Please confirm your password'],
+      // required: [true, 'Please confirm your password'],
       validate: {
         //THIS ONLY WORKS ON CREATE AND SAVE!!!
         validator: function (el) {

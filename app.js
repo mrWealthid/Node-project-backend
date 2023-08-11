@@ -16,11 +16,16 @@ const userRouter = require('./routes/userRoutes');
 const transactionRouter = require('./routes/transactionRoutes');
 const beneficiaryRouter = require('./routes/beneficiaryRoutes');
 const loanRouter = require('./routes/loanRoutes');
+const User = require('./model/userModel');
 
 const transactionController = require('./controllers/transactionController');
+const passport = require('passport')
+const session = require('express-session')
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 
 const filepath = path.join(process.cwd(), 'public');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
@@ -112,6 +117,130 @@ app.use((req, res, next) => {
 
   next();
 });
+
+
+
+//Google Authentication
+
+app.use(session({
+  secret: process.env.CLIENT_SECRET,
+  resave: true,
+  saveUninitialized: true,
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+
+
+// Configure Google Strategy
+passport.use(new GoogleStrategy({
+  clientID: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  callbackURL: 'http://localhost:3000/auth/google/callback',
+}, (accessToken, refreshToken, profile, done) => {
+
+console.log({profile: profile})
+
+  User.findOne({ googleId: profile.id }).then((newUser)=>  {
+  if (newUser) {
+console.log({foundUser: newUser})
+
+  
+    // User already exists, log them in
+    return done(null, newUser);
+  } else {
+
+
+
+
+
+    console.log({profile: profile})
+    // Create a new user in your MongoDB database
+    const newUser = new User({
+      googleId: profile.id,
+      name: profile.displayName,
+      email: profile.emails[0].value,
+      photo:profile.photos[0].value
+
+    });
+console.log({newUser: newUser})
+console.log(newUser.name)
+
+
+function generateUniqueAccountNumber() {
+  let randomDigits;
+  let result;
+  const timestamp = Date.now().toString().slice(9);
+  if (crypto && crypto.getRandomValues) {
+    const array = new Uint8Array(7);
+    crypto.getRandomValues(array);
+    randomDigits = array.join('').slice(0, 7);
+
+    result = Number(timestamp) + Number(randomDigits);
+  }
+
+  return result;
+}
+
+const payload = {
+  name: profile.displayName,
+  email: profile.emails[0].value,
+  googleId: profile.id,
+  accountNumber: generateUniqueAccountNumber()
+}
+
+
+
+    User.create(payload).then((newUser)=>{
+    console.log('User was created')
+      console.log('created user', newUser)
+      return done(null, newUser);
+    })
+    
+  }
+}).catch((err)=> {
+console.log(err)
+  })
+
+  
+
+}));
+
+// Serialize and deserialize user
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, user);
+});
+
+
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+
+  app.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  (req, res) => {
+    console.log('success', req.user)
+
+    console.log('I was called')
+
+    //If the user is found sign a jwt token
+    const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+});
+const token =signToken(req.user._id)
+
+    // Successful authentication redirects to the client application with jwt 
+    res.redirect(`${process.env.GOOGLE_SUCCESS_URL}?token=${token}`);
+  });
+
+
+
+
+
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/transactions', transactionRouter);
